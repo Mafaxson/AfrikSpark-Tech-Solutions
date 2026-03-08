@@ -15,33 +15,18 @@ export default function Community() {
   const [messages, setMessages] = useState<any[]>([]);
   const [newMessage, setNewMessage] = useState("");
 
-  if (loading) return <Layout><Section><p>Loading...</p></Section></Layout>;
-  if (!user) return <Navigate to="/login" replace />;
-  if (!isApproved) {
-    return (
-      <Layout>
-        <Section className="min-h-[60vh] flex items-center">
-          <div className="text-center max-w-md mx-auto">
-            <MessageSquare className="h-16 w-16 text-primary mx-auto mb-4" />
-            <h1 className="font-display text-2xl font-bold mb-2">Awaiting Approval</h1>
-            <p className="text-muted-foreground">Your account is pending admin approval. You'll be able to access the community once approved.</p>
-          </div>
-        </Section>
-      </Layout>
-    );
-  }
-
   useEffect(() => {
+    if (!user || !isApproved) return;
     supabase.from("channels").select("*").order("name").then(({ data }) => {
       if (data) {
         setChannels(data);
-        if (data.length > 0 && !activeChannel) setActiveChannel(data[0].id);
+        if (data.length > 0) setActiveChannel(data[0].id);
       }
     });
-  }, []);
+  }, [user, isApproved]);
 
   useEffect(() => {
-    if (!activeChannel) return;
+    if (!activeChannel || !user || !isApproved) return;
     supabase.from("messages")
       .select("*, profiles(display_name)")
       .eq("channel_id", activeChannel)
@@ -60,7 +45,23 @@ export default function Community() {
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
-  }, [activeChannel]);
+  }, [activeChannel, user, isApproved]);
+
+  if (loading) return <Layout><Section><p>Loading...</p></Section></Layout>;
+  if (!user) return <Navigate to="/login" replace />;
+  if (!isApproved) {
+    return (
+      <Layout>
+        <Section className="min-h-[60vh] flex items-center">
+          <div className="text-center max-w-md mx-auto">
+            <MessageSquare className="h-16 w-16 text-primary mx-auto mb-4" />
+            <h1 className="font-display text-2xl font-bold mb-2">Awaiting Approval</h1>
+            <p className="text-muted-foreground">Your account is pending admin approval. You'll be able to access the community once approved.</p>
+          </div>
+        </Section>
+      </Layout>
+    );
+  }
 
   const sendMessage = async () => {
     if (!newMessage.trim() || !activeChannel) return;
@@ -77,7 +78,6 @@ export default function Community() {
       <Section>
         <h1 className="font-display text-3xl font-bold mb-8">Community</h1>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 min-h-[60vh]">
-          {/* Channels sidebar */}
           <div className="bg-card rounded-xl border border-border p-4 space-y-1">
             <h3 className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wider">Channels</h3>
             {channels.map(c => (
@@ -94,7 +94,6 @@ export default function Community() {
             ))}
           </div>
 
-          {/* Messages */}
           <div className="md:col-span-3 bg-card rounded-xl border border-border flex flex-col">
             <div className="flex-1 p-4 overflow-y-auto space-y-3 max-h-[60vh]">
               {messages.map(m => (
