@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Rocket, Lightbulb, Code, DollarSign, Users } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const offerings = [
   { icon: Users, title: "Mentorship", desc: "One-on-one guidance from experienced founders and tech leaders." },
@@ -19,14 +20,26 @@ export default function VentureStudio() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
+    const form = e.target as HTMLFormElement;
+    const formData = new FormData(form);
+    const { error } = await supabase.from("startups").insert({
+      founder_name: formData.get("founder") as string,
+      startup_name: formData.get("startup") as string,
+      problem: formData.get("problem") as string,
+      solution: formData.get("solution") as string,
+      stage: formData.get("stage") as string,
+      website: formData.get("website") as string || null,
+    });
+    if (error) {
+      toast({ title: "Error", description: "Something went wrong.", variant: "destructive" });
+    } else {
       toast({ title: "Application Submitted!", description: "We'll review and reach out." });
-      setLoading(false);
-      (e.target as HTMLFormElement).reset();
-    }, 1000);
+      form.reset();
+    }
+    setLoading(false);
   };
 
   return (
