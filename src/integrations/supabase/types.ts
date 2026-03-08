@@ -44,26 +44,104 @@ export type Database = {
         }
         Relationships: []
       }
+      channel_admins: {
+        Row: {
+          channel_id: string
+          created_at: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          channel_id: string
+          created_at?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          channel_id?: string
+          created_at?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "channel_admins_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "channels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      channel_members: {
+        Row: {
+          channel_id: string
+          created_at: string | null
+          id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          channel_id: string
+          created_at?: string | null
+          id?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          channel_id?: string
+          created_at?: string | null
+          id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "channel_members_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "channels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       channels: {
         Row: {
+          cohort_id: string | null
           created_at: string | null
           description: string | null
           id: string
+          is_admin_only: boolean
           name: string
+          type: string
         }
         Insert: {
+          cohort_id?: string | null
           created_at?: string | null
           description?: string | null
           id?: string
+          is_admin_only?: boolean
           name: string
+          type?: string
         }
         Update: {
+          cohort_id?: string | null
           created_at?: string | null
           description?: string | null
           id?: string
+          is_admin_only?: boolean
           name?: string
+          type?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "channels_cohort_id_fkey"
+            columns: ["cohort_id"]
+            isOneToOne: false
+            referencedRelation: "cohorts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       cohorts: {
         Row: {
@@ -86,6 +164,60 @@ export type Database = {
           id?: string
           name?: string
           year?: number
+        }
+        Relationships: []
+      }
+      community_projects: {
+        Row: {
+          created_at: string | null
+          created_by: string
+          description: string | null
+          id: string
+          skills_needed: string[] | null
+          status: string
+          title: string
+        }
+        Insert: {
+          created_at?: string | null
+          created_by: string
+          description?: string | null
+          id?: string
+          skills_needed?: string[] | null
+          status?: string
+          title: string
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string
+          description?: string | null
+          id?: string
+          skills_needed?: string[] | null
+          status?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      connections: {
+        Row: {
+          created_at: string | null
+          id: string
+          receiver_id: string
+          requester_id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          receiver_id: string
+          requester_id: string
+          status?: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          receiver_id?: string
+          requester_id?: string
+          status?: string
         }
         Relationships: []
       }
@@ -185,6 +317,74 @@ export type Database = {
         }
         Relationships: []
       }
+      event_registrations: {
+        Row: {
+          created_at: string | null
+          event_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          event_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          event_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_registrations_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      events: {
+        Row: {
+          created_at: string | null
+          created_by: string
+          date: string
+          description: string | null
+          end_date: string | null
+          id: string
+          location: string | null
+          recording_url: string | null
+          title: string
+          type: string
+        }
+        Insert: {
+          created_at?: string | null
+          created_by: string
+          date: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          location?: string | null
+          recording_url?: string | null
+          title: string
+          type?: string
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string
+          date?: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          location?: string | null
+          recording_url?: string | null
+          title?: string
+          type?: string
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           channel_id: string | null
@@ -192,6 +392,7 @@ export type Database = {
           created_at: string | null
           file_url: string | null
           id: string
+          reply_to: string | null
           user_id: string
         }
         Insert: {
@@ -200,6 +401,7 @@ export type Database = {
           created_at?: string | null
           file_url?: string | null
           id?: string
+          reply_to?: string | null
           user_id: string
         }
         Update: {
@@ -208,6 +410,7 @@ export type Database = {
           created_at?: string | null
           file_url?: string | null
           id?: string
+          reply_to?: string | null
           user_id?: string
         }
         Relationships: [
@@ -218,7 +421,47 @@ export type Database = {
             referencedRelation: "channels"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "messages_reply_to_fkey"
+            columns: ["reply_to"]
+            isOneToOne: false
+            referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
         ]
+      }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string | null
+          id: string
+          link: string | null
+          read: boolean
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string | null
+          id?: string
+          link?: string | null
+          read?: boolean
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string | null
+          id?: string
+          link?: string | null
+          read?: boolean
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       opportunities: {
         Row: {
@@ -285,9 +528,15 @@ export type Database = {
           approved: boolean | null
           avatar_url: string | null
           bio: string | null
+          career_interest: string | null
+          cohort_id: string | null
           created_at: string | null
           display_name: string | null
           id: string
+          institution: string | null
+          location: string | null
+          skills: string[] | null
+          social_links: Json | null
           updated_at: string | null
           user_id: string
         }
@@ -295,9 +544,15 @@ export type Database = {
           approved?: boolean | null
           avatar_url?: string | null
           bio?: string | null
+          career_interest?: string | null
+          cohort_id?: string | null
           created_at?: string | null
           display_name?: string | null
           id?: string
+          institution?: string | null
+          location?: string | null
+          skills?: string[] | null
+          social_links?: Json | null
           updated_at?: string | null
           user_id: string
         }
@@ -305,11 +560,90 @@ export type Database = {
           approved?: boolean | null
           avatar_url?: string | null
           bio?: string | null
+          career_interest?: string | null
+          cohort_id?: string | null
           created_at?: string | null
           display_name?: string | null
           id?: string
+          institution?: string | null
+          location?: string | null
+          skills?: string[] | null
+          social_links?: Json | null
           updated_at?: string | null
           user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_cohort_id_fkey"
+            columns: ["cohort_id"]
+            isOneToOne: false
+            referencedRelation: "cohorts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_members: {
+        Row: {
+          created_at: string | null
+          id: string
+          project_id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          project_id: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          project_id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_members_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "community_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      resources: {
+        Row: {
+          category: string
+          created_at: string | null
+          description: string | null
+          file_url: string | null
+          id: string
+          link: string | null
+          posted_by: string
+          title: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          file_url?: string | null
+          id?: string
+          link?: string | null
+          posted_by: string
+          title: string
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          file_url?: string | null
+          id?: string
+          link?: string | null
+          posted_by?: string
+          title?: string
         }
         Relationships: []
       }
