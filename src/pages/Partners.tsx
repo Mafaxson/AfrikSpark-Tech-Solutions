@@ -93,7 +93,7 @@ export default function Partners() {
               </div>
               <div>
                 <label className="text-sm font-medium mb-1.5 block">Country</label>
-                <Input required placeholder="Country" />
+                <Input name="country" required placeholder="Country" />
               </div>
             </div>
             <div>
