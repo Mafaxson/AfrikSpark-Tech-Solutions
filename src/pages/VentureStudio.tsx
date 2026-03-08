@@ -118,7 +118,7 @@ export default function VentureStudio() {
               </div>
               <div>
                 <label className="text-sm font-medium mb-1.5 block">Website (optional)</label>
-                <Input placeholder="https://..." />
+                <Input name="website" placeholder="https://..." />
               </div>
             </div>
             <Button type="submit" className="w-full" size="lg" disabled={loading}>
