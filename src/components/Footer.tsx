@@ -29,9 +29,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
           {/* Brand */}
           <div>
-            <h3 className="font-display text-xl font-bold mb-4">
-              Afrik<span className="text-primary">Spark</span>
-            </h3>
+            <img src={logo} alt="AfrikSpark Tech Solutions" className="h-10 w-auto mb-4 brightness-0 invert" />
             <p className="text-background/60 text-sm leading-relaxed mb-6">
               Empowering Africa through digital skills and technology innovation.
             </p>
