@@ -21,14 +21,26 @@ export default function Partners() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
+    const form = e.target as HTMLFormElement;
+    const formData = new FormData(form);
+    const { error } = await supabase.from("partners").insert({
+      organization_name: formData.get("org_name") as string,
+      contact_person: formData.get("contact") as string,
+      email: formData.get("email") as string,
+      country: formData.get("country") as string,
+      interest: formData.get("interest") as string,
+      message: formData.get("message") as string,
+    });
+    if (error) {
+      toast({ title: "Error", description: "Something went wrong.", variant: "destructive" });
+    } else {
       toast({ title: "Partnership Request Sent!", description: "We'll be in touch soon." });
-      setLoading(false);
-      (e.target as HTMLFormElement).reset();
-    }, 1000);
+      form.reset();
+    }
+    setLoading(false);
   };
 
   return (
