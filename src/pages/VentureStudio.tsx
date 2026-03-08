@@ -104,7 +104,7 @@ export default function VentureStudio() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-medium mb-1.5 block">Stage</label>
-                <Select>
+                <Select name="stage">
                   <SelectTrigger>
                     <SelectValue placeholder="Select stage" />
                   </SelectTrigger>
