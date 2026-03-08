@@ -85,7 +85,7 @@ export default function Partners() {
               </div>
               <div>
                 <label className="text-sm font-medium mb-1.5 block">Contact Person</label>
-                <Input required placeholder="Full name" />
+                <Input name="contact" required placeholder="Full name" />
               </div>
               <div>
                 <label className="text-sm font-medium mb-1.5 block">Email</label>
