@@ -18,18 +18,20 @@ export default function Contact() {
     const form = e.target as HTMLFormElement;
     const formData = new FormData(form);
 
-    const { error } = await supabase.from("contact_messages").insert({
-      name: formData.get("name") as string,
-      email: formData.get("email") as string,
-      subject: formData.get("subject") as string,
-      message: formData.get("message") as string,
-    });
+    const name = formData.get("name") as string;
+    const email = formData.get("email") as string;
+    const subject = formData.get("subject") as string;
+    const message = formData.get("message") as string;
+
+    const { error } = await supabase.from("contact_messages").insert({ name, email, subject, message });
 
     if (error) {
       toast({ title: "Error", description: "Something went wrong.", variant: "destructive" });
     } else {
       toast({ title: "Message Sent!", description: "We'll get back to you soon." });
       form.reset();
+      // Notify admin
+      supabase.functions.invoke("notify-admin", { body: { type: "contact_form", data: { name, email, subject, message } } });
     }
     setLoading(false);
   };

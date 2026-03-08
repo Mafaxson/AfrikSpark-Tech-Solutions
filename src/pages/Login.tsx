@@ -50,6 +50,8 @@ export default function Login() {
         toast({ title: "Signup Failed", description: error.message, variant: "destructive" });
       } else {
         toast({ title: "Account Created!", description: "Check your email to confirm your account." });
+        // Notify admin of new signup
+        supabase.functions.invoke("notify-admin", { body: { type: "new_signup", data: { name, email } } });
       }
     }
     setLoading(false);
