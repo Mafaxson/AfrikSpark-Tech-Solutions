@@ -53,8 +53,6 @@ interface Cohort {
 }
 
 export default function DSS() {
-  const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
   const [cohorts, setCohorts] = useState<Cohort[]>([]);
 
   useEffect(() => {
@@ -71,32 +69,6 @@ export default function DSS() {
     };
     fetchCohorts();
   }, []);
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
-    const form = e.target as HTMLFormElement;
-    const formData = new FormData(form);
-
-    const { error } = await supabase.from("dss_applications").insert({
-      name: formData.get("name") as string,
-      email: formData.get("email") as string,
-      phone: formData.get("phone") as string,
-      city: formData.get("city") as string,
-      age: parseInt(formData.get("age") as string),
-      education: formData.get("education") as string,
-      skill_interest: formData.get("skill_interest") as string,
-      motivation: formData.get("motivation") as string,
-    });
-
-    if (error) {
-      toast({ title: "Error", description: "Something went wrong. Please try again.", variant: "destructive" });
-    } else {
-      toast({ title: "Application Submitted!", description: "We'll review your application and get back to you." });
-      form.reset();
-    }
-    setLoading(false);
-  };
 
   return (
     <Layout>
