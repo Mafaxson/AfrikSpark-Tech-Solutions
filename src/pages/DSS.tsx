@@ -2,13 +2,30 @@ import { useState, useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { Section, SectionHeader, AnimateOnScroll } from "@/components/SectionComponents";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { GraduationCap, Palette, Video, Camera, Code, Megaphone, Users, Briefcase, Heart, Star, BookOpen, MessageCircle, Calendar, ArrowRight } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { GraduationCap, Palette, Video, Camera, Code, Megaphone, Users, Briefcase, Heart, Star, BookOpen, MessageCircle, ArrowRight, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
+
+function ApplicationButton() {
+  const [link, setLink] = useState<string | null>(null);
+  useEffect(() => {
+    supabase.from("site_settings").select("value").eq("key", "dss_application_link").single().then(({ data }) => {
+      if (data) setLink(data.value);
+    });
+  }, []);
+  
+  if (!link) {
+    return <p className="text-muted-foreground text-sm">Applications are currently closed. Check back soon!</p>;
+  }
+  
+  return (
+    <Button size="lg" className="w-full" asChild>
+      <a href={link} target="_blank" rel="noopener noreferrer">
+        Apply Now <ExternalLink className="ml-2 h-4 w-4" />
+      </a>
+    </Button>
+  );
+}
 
 const skills = [
   { icon: Megaphone, title: "Content Creation", description: "Learn to create engaging content for social media, blogs, and brands." },
