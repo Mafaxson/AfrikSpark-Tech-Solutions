@@ -98,7 +98,7 @@ export default function Partners() {
             </div>
             <div>
               <label className="text-sm font-medium mb-1.5 block">Partnership Interest</label>
-              <Select>
+              <Select name="interest">
                 <SelectTrigger>
                   <SelectValue placeholder="Select interest" />
                 </SelectTrigger>
