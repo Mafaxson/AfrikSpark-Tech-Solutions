@@ -313,6 +313,27 @@ export type Database = {
         }
         Relationships: []
       }
+      site_settings: {
+        Row: {
+          id: string
+          key: string
+          updated_at: string | null
+          value: string | null
+        }
+        Insert: {
+          id?: string
+          key: string
+          updated_at?: string | null
+          value?: string | null
+        }
+        Update: {
+          id?: string
+          key?: string
+          updated_at?: string | null
+          value?: string | null
+        }
+        Relationships: []
+      }
       startups: {
         Row: {
           created_at: string | null
@@ -383,6 +404,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      testimonies: {
+        Row: {
+          approved: boolean
+          contact: string | null
+          created_at: string | null
+          id: string
+          image_url: string | null
+          name: string
+          testimony: string
+          video_url: string | null
+        }
+        Insert: {
+          approved?: boolean
+          contact?: string | null
+          created_at?: string | null
+          id?: string
+          image_url?: string | null
+          name: string
+          testimony: string
+          video_url?: string | null
+        }
+        Update: {
+          approved?: boolean
+          contact?: string | null
+          created_at?: string | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          testimony?: string
+          video_url?: string | null
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
