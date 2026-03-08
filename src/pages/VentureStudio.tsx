@@ -86,7 +86,7 @@ export default function VentureStudio() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-medium mb-1.5 block">Founder Name</label>
-                <Input required placeholder="Your name" />
+                <Input name="founder" required placeholder="Your name" />
               </div>
               <div>
                 <label className="text-sm font-medium mb-1.5 block">Startup Name</label>
