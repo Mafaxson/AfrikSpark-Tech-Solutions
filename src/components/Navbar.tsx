@@ -11,7 +11,7 @@ const navItems = [
   { label: "Services", path: "/services" },
   { label: "DSS", path: "/dss" },
   { label: "Projects", path: "/projects" },
-  { label: "Impact", path: "/impact" },
+  { label: "Testimonies", path: "/impact" },
   { label: "Partners", path: "/partners" },
   { label: "Venture Studio", path: "/venture-studio" },
   { label: "Blog", path: "/blog" },

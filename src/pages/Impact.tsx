@@ -1,5 +1,12 @@
+import { useState, useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { Section, SectionHeader, AnimateOnScroll, StatCounter } from "@/components/SectionComponents";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { Quote, Send, Star } from "lucide-react";
 
 const stats = [
   { value: "50+", label: "Youth Trained in Digital Skills" },
@@ -8,19 +15,65 @@ const stats = [
   { value: "3+", label: "Innovation Projects Launched" },
 ];
 
+interface Testimony {
+  id: string;
+  name: string;
+  contact: string | null;
+  image_url: string | null;
+  video_url: string | null;
+  testimony: string;
+  created_at: string | null;
+}
+
 export default function Impact() {
+  const { toast } = useToast();
+  const [testimonies, setTestimonies] = useState<Testimony[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    supabase
+      .from("testimonies")
+      .select("*")
+      .eq("approved", true)
+      .order("created_at", { ascending: false })
+      .then(({ data }) => {
+        if (data) setTestimonies(data);
+      });
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+    const form = e.target as HTMLFormElement;
+    const formData = new FormData(form);
+
+    const { error } = await supabase.from("testimonies").insert({
+      name: formData.get("name") as string,
+      contact: formData.get("contact") as string || null,
+      testimony: formData.get("testimony") as string,
+    });
+
+    if (error) {
+      toast({ title: "Error", description: "Something went wrong.", variant: "destructive" });
+    } else {
+      toast({ title: "Thank you!", description: "Your testimony has been submitted and will appear after review." });
+      form.reset();
+    }
+    setLoading(false);
+  };
+
   return (
     <Layout>
       <section className="bg-hero min-h-[40vh] flex items-center relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,hsl(25_95%_53%/0.12),transparent_60%)]" />
         <div className="container mx-auto px-4 relative z-10 py-20">
           <AnimateOnScroll>
-            <span className="inline-block text-xs font-semibold uppercase tracking-widest text-primary mb-4">Our Impact</span>
+            <span className="inline-block text-xs font-semibold uppercase tracking-widest text-primary mb-4">Testimonies</span>
             <h1 className="font-display text-4xl md:text-5xl font-bold text-primary-foreground mb-4">
-              Making a Difference
+              Voices of Impact
             </h1>
             <p className="text-primary-foreground/70 text-lg max-w-xl">
-              Every number tells a story of transformation and empowerment.
+              Real stories from the people whose lives we've touched through our programs.
             </p>
           </AnimateOnScroll>
         </div>
@@ -36,20 +89,70 @@ export default function Impact() {
         </div>
       </Section>
 
+      {/* Testimonies */}
       <Section alt>
-        <SectionHeader badge="Stories" title="Impact Stories" description="Real stories from the youth we've empowered through our programs." />
-        <div className="grid md:grid-cols-2 gap-8">
-          {[
-            { name: "Youth Training", text: "Our Digital Skills Scholarship has helped dozens of young people gain marketable skills and start earning from their talents." },
-            { name: "Community Projects", text: "Through GreenBin Connect and Citizens Voice, we're addressing real challenges in waste management and civic engagement." },
-          ].map((story, i) => (
-            <AnimateOnScroll key={i} delay={i * 100}>
-              <div className="bg-card rounded-xl p-8 border border-border">
-                <h3 className="font-display font-bold text-lg mb-3">{story.name}</h3>
-                <p className="text-muted-foreground leading-relaxed">{story.text}</p>
+        <SectionHeader badge="Testimonies" title="What People Say" description="Hear from our scholars, partners, and community members." />
+        {testimonies.length > 0 ? (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {testimonies.map((t, i) => (
+              <AnimateOnScroll key={t.id} delay={i * 80}>
+                <div className="bg-card rounded-xl p-6 border border-border h-full flex flex-col">
+                  <Quote className="h-8 w-8 text-primary/20 mb-4" />
+                  {t.image_url && (
+                    <img src={t.image_url} alt={t.name} className="w-16 h-16 rounded-full object-cover mb-4" />
+                  )}
+                  {t.video_url && (
+                    <video controls className="w-full rounded-lg mb-4 max-h-48 object-cover">
+                      <source src={t.video_url} />
+                    </video>
+                  )}
+                  <p className="text-muted-foreground leading-relaxed flex-1 mb-4">"{t.testimony}"</p>
+                  <div className="flex items-center gap-2 mt-auto">
+                    <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Star className="h-4 w-4 text-primary" />
+                    </div>
+                    <span className="font-display font-semibold text-sm">{t.name}</span>
+                  </div>
+                </div>
+              </AnimateOnScroll>
+            ))}
+          </div>
+        ) : (
+          <AnimateOnScroll>
+            <div className="text-center py-12 bg-card rounded-xl border border-border">
+              <Quote className="h-12 w-12 text-primary/20 mx-auto mb-4" />
+              <h3 className="font-display text-xl font-semibold mb-2">Testimonies Coming Soon</h3>
+              <p className="text-muted-foreground">Be the first to share your experience with AfrikSpark!</p>
+            </div>
+          </AnimateOnScroll>
+        )}
+      </Section>
+
+      {/* Submit Testimony */}
+      <Section>
+        <SectionHeader badge="Share" title="Share Your Story" description="Have we made an impact on your life? We'd love to hear from you." />
+        <div className="max-w-2xl mx-auto">
+          <form onSubmit={handleSubmit} className="bg-card rounded-xl p-8 border border-border space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium mb-1.5 block">Your Name *</label>
+                <Input name="name" required placeholder="Your full name" />
               </div>
-            </AnimateOnScroll>
-          ))}
+              <div>
+                <label className="text-sm font-medium mb-1.5 block">Contact (optional)</label>
+                <Input name="contact" placeholder="Email or phone" />
+              </div>
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-1.5 block">Your Testimony *</label>
+              <Textarea name="testimony" required placeholder="Tell us how AfrikSpark has impacted your life..." rows={5} />
+            </div>
+            <Button type="submit" className="w-full" size="lg" disabled={loading}>
+              <Send className="h-4 w-4 mr-2" />
+              {loading ? "Submitting..." : "Submit Testimony"}
+            </Button>
+            <p className="text-xs text-muted-foreground text-center">Your testimony will be reviewed before being published.</p>
+          </form>
         </div>
       </Section>
     </Layout>
