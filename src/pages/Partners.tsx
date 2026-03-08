@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Handshake, Award, Users, Lightbulb } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const benefits = [
   { icon: Award, title: "Brand Visibility", desc: "Showcase your brand across our programs and platforms." },
@@ -19,14 +20,26 @@ export default function Partners() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
+    const form = e.target as HTMLFormElement;
+    const formData = new FormData(form);
+    const { error } = await supabase.from("partners").insert({
+      organization_name: formData.get("org_name") as string,
+      contact_person: formData.get("contact") as string,
+      email: formData.get("email") as string,
+      country: formData.get("country") as string,
+      interest: formData.get("interest") as string,
+      message: formData.get("message") as string,
+    });
+    if (error) {
+      toast({ title: "Error", description: "Something went wrong.", variant: "destructive" });
+    } else {
       toast({ title: "Partnership Request Sent!", description: "We'll be in touch soon." });
-      setLoading(false);
-      (e.target as HTMLFormElement).reset();
-    }, 1000);
+      form.reset();
+    }
+    setLoading(false);
   };
 
   return (
@@ -68,24 +81,24 @@ export default function Partners() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-medium mb-1.5 block">Organization Name</label>
-                <Input required placeholder="Your organization" />
+                <Input name="org_name" required placeholder="Your organization" />
               </div>
               <div>
                 <label className="text-sm font-medium mb-1.5 block">Contact Person</label>
-                <Input required placeholder="Full name" />
+                <Input name="contact" required placeholder="Full name" />
               </div>
               <div>
                 <label className="text-sm font-medium mb-1.5 block">Email</label>
-                <Input type="email" required placeholder="email@org.com" />
+                <Input name="email" type="email" required placeholder="email@org.com" />
               </div>
               <div>
                 <label className="text-sm font-medium mb-1.5 block">Country</label>
-                <Input required placeholder="Country" />
+                <Input name="country" required placeholder="Country" />
               </div>
             </div>
             <div>
               <label className="text-sm font-medium mb-1.5 block">Partnership Interest</label>
-              <Select>
+              <Select name="interest">
                 <SelectTrigger>
                   <SelectValue placeholder="Select interest" />
                 </SelectTrigger>
@@ -100,7 +113,7 @@ export default function Partners() {
             </div>
             <div>
               <label className="text-sm font-medium mb-1.5 block">Message</label>
-              <Textarea placeholder="Tell us about your interest..." rows={4} />
+              <Textarea name="message" placeholder="Tell us about your interest..." rows={4} />
             </div>
             <Button type="submit" className="w-full" size="lg" disabled={loading}>
               {loading ? "Sending..." : "Submit Partnership Request"}

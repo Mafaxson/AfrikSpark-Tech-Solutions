@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { GraduationCap, Palette, Video, Camera, Code, Megaphone } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const skills = [
   { icon: Megaphone, title: "Content Creation" },
@@ -20,15 +21,30 @@ export default function DSS() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    // Will connect to Supabase later
-    setTimeout(() => {
+    const form = e.target as HTMLFormElement;
+    const formData = new FormData(form);
+
+    const { error } = await supabase.from("dss_applications").insert({
+      name: formData.get("name") as string,
+      email: formData.get("email") as string,
+      phone: formData.get("phone") as string,
+      city: formData.get("city") as string,
+      age: parseInt(formData.get("age") as string),
+      education: formData.get("education") as string,
+      skill_interest: formData.get("skill_interest") as string,
+      motivation: formData.get("motivation") as string,
+    });
+
+    if (error) {
+      toast({ title: "Error", description: "Something went wrong. Please try again.", variant: "destructive" });
+    } else {
       toast({ title: "Application Submitted!", description: "We'll review your application and get back to you." });
-      setLoading(false);
-      (e.target as HTMLFormElement).reset();
-    }, 1000);
+      form.reset();
+    }
+    setLoading(false);
   };
 
   return (
@@ -51,7 +67,6 @@ export default function DSS() {
         </div>
       </section>
 
-      {/* Skills */}
       <Section>
         <SectionHeader badge="What You'll Learn" title="Skills Covered" description="Master in-demand digital skills that open doors to freelancing, employment, and entrepreneurship." />
         <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
@@ -68,7 +83,6 @@ export default function DSS() {
         </div>
       </Section>
 
-      {/* Application Form */}
       <Section alt id="apply">
         <SectionHeader badge="Join Us" title="Apply for DSS" description="Fill out the form below to apply for our next cohort." />
         <div className="max-w-2xl mx-auto">

@@ -1,24 +1,37 @@
 import { useState } from "react";
 import { Layout } from "@/components/Layout";
-import { Section, SectionHeader, AnimateOnScroll } from "@/components/SectionComponents";
+import { Section, AnimateOnScroll } from "@/components/SectionComponents";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Mail, MapPin, Phone } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function Contact() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
+    const form = e.target as HTMLFormElement;
+    const formData = new FormData(form);
+
+    const { error } = await supabase.from("contact_messages").insert({
+      name: formData.get("name") as string,
+      email: formData.get("email") as string,
+      subject: formData.get("subject") as string,
+      message: formData.get("message") as string,
+    });
+
+    if (error) {
+      toast({ title: "Error", description: "Something went wrong.", variant: "destructive" });
+    } else {
       toast({ title: "Message Sent!", description: "We'll get back to you soon." });
-      setLoading(false);
-      (e.target as HTMLFormElement).reset();
-    }, 1000);
+      form.reset();
+    }
+    setLoading(false);
   };
 
   return (
@@ -36,7 +49,6 @@ export default function Contact() {
 
       <Section>
         <div className="grid md:grid-cols-3 gap-10">
-          {/* Info */}
           <div className="space-y-6">
             <AnimateOnScroll>
               <h2 className="font-display text-2xl font-bold mb-6">Contact Information</h2>
@@ -60,27 +72,26 @@ export default function Contact() {
             </AnimateOnScroll>
           </div>
 
-          {/* Form */}
           <div className="md:col-span-2">
             <AnimateOnScroll delay={100}>
               <form onSubmit={handleSubmit} className="bg-card rounded-xl p-8 border border-border space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="text-sm font-medium mb-1.5 block">Name</label>
-                    <Input required placeholder="Your name" />
+                    <Input name="name" required placeholder="Your name" />
                   </div>
                   <div>
                     <label className="text-sm font-medium mb-1.5 block">Email</label>
-                    <Input type="email" required placeholder="your@email.com" />
+                    <Input name="email" type="email" required placeholder="your@email.com" />
                   </div>
                 </div>
                 <div>
                   <label className="text-sm font-medium mb-1.5 block">Subject</label>
-                  <Input required placeholder="Subject" />
+                  <Input name="subject" required placeholder="Subject" />
                 </div>
                 <div>
                   <label className="text-sm font-medium mb-1.5 block">Message</label>
-                  <Textarea required placeholder="Your message..." rows={5} />
+                  <Textarea name="message" required placeholder="Your message..." rows={5} />
                 </div>
                 <Button type="submit" className="w-full" size="lg" disabled={loading}>
                   {loading ? "Sending..." : "Send Message"}

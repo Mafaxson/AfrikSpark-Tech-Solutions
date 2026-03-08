@@ -1,12 +1,59 @@
+import { useState } from "react";
 import { Layout } from "@/components/Layout";
 import { Section, AnimateOnScroll } from "@/components/SectionComponents";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function Login() {
   const [isLogin, setIsLogin] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    if (isLogin) {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        toast({ title: "Login Failed", description: error.message, variant: "destructive" });
+      } else {
+        toast({ title: "Welcome back!" });
+        // Check if admin
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data: roles } = await supabase.from("user_roles").select("role").eq("user_id", user.id);
+          if (roles?.some(r => r.role === "admin")) {
+            navigate("/admin");
+          } else {
+            navigate("/community");
+          }
+        }
+      }
+    } else {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { full_name: name },
+          emailRedirectTo: window.location.origin,
+        },
+      });
+      if (error) {
+        toast({ title: "Signup Failed", description: error.message, variant: "destructive" });
+      } else {
+        toast({ title: "Account Created!", description: "Check your email to confirm your account." });
+      }
+    }
+    setLoading(false);
+  };
 
   return (
     <Layout>
@@ -21,31 +68,31 @@ export default function Login() {
                 {isLogin ? "Sign in to access the community and dashboard." : "Join the AfrikSpark community."}
               </p>
             </div>
-            <div className="bg-card rounded-xl p-8 border border-border space-y-4">
+            <form onSubmit={handleSubmit} className="bg-card rounded-xl p-8 border border-border space-y-4">
               {!isLogin && (
                 <div>
                   <label className="text-sm font-medium mb-1.5 block">Full Name</label>
-                  <Input placeholder="Your name" />
+                  <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" required />
                 </div>
               )}
               <div>
                 <label className="text-sm font-medium mb-1.5 block">Email</label>
-                <Input type="email" placeholder="your@email.com" />
+                <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="your@email.com" required />
               </div>
               <div>
                 <label className="text-sm font-medium mb-1.5 block">Password</label>
-                <Input type="password" placeholder="••••••••" />
+                <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required minLength={6} />
               </div>
-              <Button className="w-full" size="lg">
-                {isLogin ? "Sign In" : "Create Account"}
+              <Button type="submit" className="w-full" size="lg" disabled={loading}>
+                {loading ? "Please wait..." : isLogin ? "Sign In" : "Create Account"}
               </Button>
               <p className="text-center text-sm text-muted-foreground">
                 {isLogin ? "Don't have an account? " : "Already have an account? "}
-                <button onClick={() => setIsLogin(!isLogin)} className="text-primary hover:underline font-medium">
+                <button type="button" onClick={() => setIsLogin(!isLogin)} className="text-primary hover:underline font-medium">
                   {isLogin ? "Sign Up" : "Sign In"}
                 </button>
               </p>
-            </div>
+            </form>
           </AnimateOnScroll>
         </div>
       </Section>
