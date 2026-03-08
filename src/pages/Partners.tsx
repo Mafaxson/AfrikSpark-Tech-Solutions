@@ -113,7 +113,7 @@ export default function Partners() {
             </div>
             <div>
               <label className="text-sm font-medium mb-1.5 block">Message</label>
-              <Textarea placeholder="Tell us about your interest..." rows={4} />
+              <Textarea name="message" placeholder="Tell us about your interest..." rows={4} />
             </div>
             <Button type="submit" className="w-full" size="lg" disabled={loading}>
               {loading ? "Sending..." : "Submit Partnership Request"}
