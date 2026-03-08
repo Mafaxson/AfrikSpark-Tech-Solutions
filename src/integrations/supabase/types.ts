@@ -14,16 +14,409 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      blog_posts: {
+        Row: {
+          category: string | null
+          content: string | null
+          created_at: string | null
+          id: string
+          image_url: string | null
+          slug: string
+          title: string
+        }
+        Insert: {
+          category?: string | null
+          content?: string | null
+          created_at?: string | null
+          id?: string
+          image_url?: string | null
+          slug: string
+          title: string
+        }
+        Update: {
+          category?: string | null
+          content?: string | null
+          created_at?: string | null
+          id?: string
+          image_url?: string | null
+          slug?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      channels: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      cohorts: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          year: number
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          year: number
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          year?: number
+        }
+        Relationships: []
+      }
+      contact_messages: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          message: string
+          name: string
+          subject: string
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: string
+          message: string
+          name: string
+          subject: string
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          message?: string
+          name?: string
+          subject?: string
+        }
+        Relationships: []
+      }
+      direct_messages: {
+        Row: {
+          content: string
+          created_at: string | null
+          file_url: string | null
+          id: string
+          receiver_id: string
+          sender_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          file_url?: string | null
+          id?: string
+          receiver_id: string
+          sender_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          file_url?: string | null
+          id?: string
+          receiver_id?: string
+          sender_id?: string
+        }
+        Relationships: []
+      }
+      dss_applications: {
+        Row: {
+          age: number
+          city: string
+          created_at: string | null
+          education: string
+          email: string
+          id: string
+          motivation: string
+          name: string
+          phone: string
+          skill_interest: string
+          status: string
+        }
+        Insert: {
+          age: number
+          city: string
+          created_at?: string | null
+          education: string
+          email: string
+          id?: string
+          motivation: string
+          name: string
+          phone: string
+          skill_interest: string
+          status?: string
+        }
+        Update: {
+          age?: number
+          city?: string
+          created_at?: string | null
+          education?: string
+          email?: string
+          id?: string
+          motivation?: string
+          name?: string
+          phone?: string
+          skill_interest?: string
+          status?: string
+        }
+        Relationships: []
+      }
+      messages: {
+        Row: {
+          channel_id: string | null
+          content: string
+          created_at: string | null
+          file_url: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          channel_id?: string | null
+          content: string
+          created_at?: string | null
+          file_url?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          channel_id?: string | null
+          content?: string
+          created_at?: string | null
+          file_url?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "channels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      opportunities: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          link: string | null
+          posted_by: string
+          title: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          link?: string | null
+          posted_by: string
+          title: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          link?: string | null
+          posted_by?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      partners: {
+        Row: {
+          contact_person: string
+          country: string
+          created_at: string | null
+          email: string
+          id: string
+          interest: string | null
+          message: string | null
+          organization_name: string
+        }
+        Insert: {
+          contact_person: string
+          country: string
+          created_at?: string | null
+          email: string
+          id?: string
+          interest?: string | null
+          message?: string | null
+          organization_name: string
+        }
+        Update: {
+          contact_person?: string
+          country?: string
+          created_at?: string | null
+          email?: string
+          id?: string
+          interest?: string | null
+          message?: string | null
+          organization_name?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          approved: boolean | null
+          avatar_url: string | null
+          bio: string | null
+          created_at: string | null
+          display_name: string | null
+          id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          approved?: boolean | null
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string | null
+          display_name?: string | null
+          id?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          approved?: boolean | null
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string | null
+          display_name?: string | null
+          id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      startups: {
+        Row: {
+          created_at: string | null
+          founder_name: string
+          id: string
+          problem: string
+          solution: string
+          stage: string | null
+          startup_name: string
+          website: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          founder_name: string
+          id?: string
+          problem: string
+          solution: string
+          stage?: string | null
+          startup_name: string
+          website?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          founder_name?: string
+          id?: string
+          problem?: string
+          solution?: string
+          stage?: string | null
+          startup_name?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
+      students: {
+        Row: {
+          bio: string | null
+          city: string | null
+          cohort_id: string | null
+          id: string
+          name: string
+          photo_url: string | null
+          skill: string | null
+        }
+        Insert: {
+          bio?: string | null
+          city?: string | null
+          cohort_id?: string | null
+          id?: string
+          name: string
+          photo_url?: string | null
+          skill?: string | null
+        }
+        Update: {
+          bio?: string | null
+          city?: string | null
+          cohort_id?: string | null
+          id?: string
+          name?: string
+          photo_url?: string | null
+          skill?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "students_cohort_id_fkey"
+            columns: ["cohort_id"]
+            isOneToOne: false
+            referencedRelation: "cohorts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +543,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "user"],
+    },
   },
 } as const
