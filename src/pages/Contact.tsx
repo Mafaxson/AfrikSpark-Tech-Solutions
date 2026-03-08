@@ -57,8 +57,8 @@ export default function Contact() {
               <div className="space-y-4">
                 {[
                   { icon: MapPin, label: "Location", value: "Sierra Leone" },
-                  { icon: Mail, label: "Email", value: "info@afrikspark.com" },
-                  { icon: Phone, label: "Phone", value: "+232 XX XXX XXXX" },
+                  { icon: Mail, label: "Email", value: "info@afrikspark.tech" },
+                  { icon: Phone, label: "Phone", value: "+232 77 299 080" },
                 ].map((item) => (
                   <div key={item.label} className="flex items-start gap-3">
                     <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
