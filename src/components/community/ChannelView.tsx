@@ -29,7 +29,7 @@ export function ChannelView({ channelId, onViewProfile }: Props) {
     });
 
     supabase.from("messages")
-      .select("*, profiles!messages_user_id_fkey(display_name, avatar_url, user_id)")
+      .select("*")
       .eq("channel_id", channelId)
       .order("created_at", { ascending: true })
       .limit(200)
