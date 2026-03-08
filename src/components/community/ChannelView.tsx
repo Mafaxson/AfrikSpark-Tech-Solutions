@@ -134,27 +134,29 @@ export function ChannelView({ channelId, onViewProfile }: Props) {
 
       {/* Messages */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-3">
-        {messages.map(m => (
+        {messages.map(m => {
+          const prof = profileMap[m.user_id];
+          return (
           <div key={m.id} className="flex gap-3 group">
             <button 
-              onClick={() => m.profiles?.user_id && onViewProfile(m.profiles.user_id)}
+              onClick={() => m.user_id && onViewProfile(m.user_id)}
               className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 hover:ring-2 hover:ring-primary/30 transition"
             >
-              {m.profiles?.avatar_url ? (
-                <img src={m.profiles.avatar_url} className="h-8 w-8 rounded-full object-cover" />
+              {prof?.avatar_url ? (
+                <img src={prof.avatar_url} className="h-8 w-8 rounded-full object-cover" />
               ) : (
                 <span className="text-xs font-bold text-primary">
-                  {(m.profiles?.display_name ?? "U").charAt(0).toUpperCase()}
+                  {(prof?.display_name ?? "U").charAt(0).toUpperCase()}
                 </span>
               )}
             </button>
             <div className="flex-1 min-w-0">
               <div className="flex items-baseline gap-2">
                 <button 
-                  onClick={() => m.profiles?.user_id && onViewProfile(m.profiles.user_id)}
+                  onClick={() => m.user_id && onViewProfile(m.user_id)}
                   className="text-sm font-semibold hover:text-primary transition"
                 >
-                  {m.profiles?.display_name ?? "User"}
+                  {prof?.display_name ?? "User"}
                 </button>
                 <span className="text-xs text-muted-foreground">
                   {new Date(m.created_at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
@@ -175,7 +177,8 @@ export function ChannelView({ channelId, onViewProfile }: Props) {
               )}
             </div>
           </div>
-        ))}
+          );
+        })}
         {messages.length === 0 && (
           <p className="text-muted-foreground text-center py-10 text-sm">No messages yet. Start the conversation!</p>
         )}
