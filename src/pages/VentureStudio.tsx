@@ -90,7 +90,7 @@ export default function VentureStudio() {
               </div>
               <div>
                 <label className="text-sm font-medium mb-1.5 block">Startup Name</label>
-                <Input required placeholder="Startup name" />
+                <Input name="startup" required placeholder="Startup name" />
               </div>
             </div>
             <div>
