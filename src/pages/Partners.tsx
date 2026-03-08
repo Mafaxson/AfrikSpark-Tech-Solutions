@@ -81,7 +81,7 @@ export default function Partners() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-medium mb-1.5 block">Organization Name</label>
-                <Input required placeholder="Your organization" />
+                <Input name="org_name" required placeholder="Your organization" />
               </div>
               <div>
                 <label className="text-sm font-medium mb-1.5 block">Contact Person</label>
