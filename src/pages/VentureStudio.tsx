@@ -95,7 +95,7 @@ export default function VentureStudio() {
             </div>
             <div>
               <label className="text-sm font-medium mb-1.5 block">Problem Being Solved</label>
-              <Textarea required placeholder="Describe the problem..." rows={3} />
+              <Textarea name="problem" required placeholder="Describe the problem..." rows={3} />
             </div>
             <div>
               <label className="text-sm font-medium mb-1.5 block">Your Solution</label>
