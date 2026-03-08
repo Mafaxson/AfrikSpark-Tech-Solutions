@@ -10,10 +10,10 @@ import { useToast } from "@/hooks/use-toast";
 import { Navigate } from "react-router-dom";
 import {
   Users, FileText, MessageSquare, GraduationCap, BookOpen, Mail,
-  Check, X, Plus, Trash2
+  Check, X, Plus, Trash2, Edit, Star, UserCheck, Link as LinkIcon, Save
 } from "lucide-react";
 
-type Tab = "overview" | "applications" | "cohorts" | "students" | "blog" | "messages";
+type Tab = "overview" | "applications" | "cohorts" | "students" | "blog" | "messages" | "testimonies" | "community" | "settings";
 
 export default function AdminDashboard() {
   const { user, isAdmin, loading } = useAuth();
@@ -29,6 +29,9 @@ export default function AdminDashboard() {
     { id: "students", label: "Students", icon: Users },
     { id: "blog", label: "Blog", icon: FileText },
     { id: "messages", label: "Messages", icon: Mail },
+    { id: "testimonies", label: "Testimonies", icon: Star },
+    { id: "community", label: "Community", icon: UserCheck },
+    { id: "settings", label: "Settings", icon: LinkIcon },
   ];
 
   return (
@@ -55,6 +58,9 @@ export default function AdminDashboard() {
         {activeTab === "students" && <StudentsPanel />}
         {activeTab === "blog" && <BlogPanel />}
         {activeTab === "messages" && <MessagesPanel />}
+        {activeTab === "testimonies" && <TestimoniesPanel />}
+        {activeTab === "community" && <CommunityPanel />}
+        {activeTab === "settings" && <SettingsPanel />}
       </Section>
     </Layout>
   );
@@ -65,12 +71,14 @@ function OverviewPanel() {
 
   useEffect(() => {
     const fetchStats = async () => {
-      const [apps, students, cohorts, messages, blogs] = await Promise.all([
+      const [apps, students, cohorts, messages, blogs, testimonies, pending] = await Promise.all([
         supabase.from("dss_applications").select("id", { count: "exact", head: true }),
         supabase.from("students").select("id", { count: "exact", head: true }),
         supabase.from("cohorts").select("id", { count: "exact", head: true }),
         supabase.from("contact_messages").select("id", { count: "exact", head: true }),
         supabase.from("blog_posts").select("id", { count: "exact", head: true }),
+        supabase.from("testimonies").select("id", { count: "exact", head: true }),
+        supabase.from("profiles").select("id", { count: "exact", head: true }).eq("approved", false),
       ]);
       setStats({
         applications: apps.count ?? 0,
@@ -78,6 +86,8 @@ function OverviewPanel() {
         cohorts: cohorts.count ?? 0,
         messages: messages.count ?? 0,
         blogs: blogs.count ?? 0,
+        testimonies: testimonies.count ?? 0,
+        pendingApprovals: pending.count ?? 0,
       });
     };
     fetchStats();
@@ -89,6 +99,8 @@ function OverviewPanel() {
     { label: "Cohorts", value: stats.cohorts ?? 0, icon: BookOpen },
     { label: "Blog Posts", value: stats.blogs ?? 0, icon: FileText },
     { label: "Contact Messages", value: stats.messages ?? 0, icon: Mail },
+    { label: "Testimonies", value: stats.testimonies ?? 0, icon: Star },
+    { label: "Pending Approvals", value: stats.pendingApprovals ?? 0, icon: UserCheck },
   ];
 
   return (
@@ -140,19 +152,19 @@ function ApplicationsPanel() {
             </div>
             <div className="flex items-center gap-2">
               <span className={`text-xs font-medium px-2 py-1 rounded ${
-                app.status === "approved" ? "bg-success/20 text-success" :
-                app.status === "rejected" ? "bg-destructive/20 text-destructive" :
-                "bg-warning/20 text-warning"
+                app.status === "approved" ? "bg-green-100 text-green-700" :
+                app.status === "rejected" ? "bg-red-100 text-red-700" :
+                "bg-yellow-100 text-yellow-700"
               }`}>
                 {app.status}
               </span>
               {app.status === "pending" && (
                 <>
                   <Button size="sm" variant="ghost" onClick={() => updateStatus(app.id, "approved")}>
-                    <Check className="h-4 w-4 text-success" />
+                    <Check className="h-4 w-4 text-green-600" />
                   </Button>
                   <Button size="sm" variant="ghost" onClick={() => updateStatus(app.id, "rejected")}>
-                    <X className="h-4 w-4 text-destructive" />
+                    <X className="h-4 w-4 text-red-600" />
                   </Button>
                 </>
               )}
@@ -353,6 +365,205 @@ function MessagesPanel() {
           <p className="text-sm">{m.message}</p>
         </div>
       ))}
+    </div>
+  );
+}
+
+function TestimoniesPanel() {
+  const [testimonies, setTestimonies] = useState<any[]>([]);
+  const [name, setName] = useState("");
+  const [contact, setContact] = useState("");
+  const [testimony, setTestimony] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+  const [videoUrl, setVideoUrl] = useState("");
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const { toast } = useToast();
+
+  const fetchTestimonies = () => {
+    supabase.from("testimonies").select("*").order("created_at", { ascending: false }).then(({ data }) => {
+      if (data) setTestimonies(data);
+    });
+  };
+
+  useEffect(() => { fetchTestimonies(); }, []);
+
+  const resetForm = () => {
+    setName(""); setContact(""); setTestimony(""); setImageUrl(""); setVideoUrl("");
+    setEditingId(null);
+  };
+
+  const handleSave = async () => {
+    if (!name || !testimony) return;
+    const payload = { name, contact: contact || null, testimony, image_url: imageUrl || null, video_url: videoUrl || null, approved: true };
+
+    if (editingId) {
+      const { error } = await supabase.from("testimonies").update(payload).eq("id", editingId);
+      if (!error) { toast({ title: "Testimony updated" }); resetForm(); fetchTestimonies(); }
+    } else {
+      const { error } = await supabase.from("testimonies").insert(payload);
+      if (!error) { toast({ title: "Testimony added" }); resetForm(); fetchTestimonies(); }
+    }
+  };
+
+  const startEdit = (t: any) => {
+    setEditingId(t.id);
+    setName(t.name);
+    setContact(t.contact || "");
+    setTestimony(t.testimony);
+    setImageUrl(t.image_url || "");
+    setVideoUrl(t.video_url || "");
+  };
+
+  const handleDelete = async (id: string) => {
+    await supabase.from("testimonies").delete().eq("id", id);
+    toast({ title: "Testimony deleted" });
+    fetchTestimonies();
+  };
+
+  const toggleApproval = async (id: string, current: boolean) => {
+    await supabase.from("testimonies").update({ approved: !current }).eq("id", id);
+    toast({ title: current ? "Testimony hidden" : "Testimony approved" });
+    fetchTestimonies();
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="bg-card rounded-xl p-6 border border-border space-y-4">
+        <h3 className="font-semibold">{editingId ? "Edit Testimony" : "Add Testimony"}</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Input placeholder="Person's name" value={name} onChange={e => setName(e.target.value)} />
+          <Input placeholder="Contact (email/phone)" value={contact} onChange={e => setContact(e.target.value)} />
+          <Input placeholder="Image URL (optional)" value={imageUrl} onChange={e => setImageUrl(e.target.value)} />
+          <Input placeholder="Video URL (optional)" value={videoUrl} onChange={e => setVideoUrl(e.target.value)} />
+        </div>
+        <Textarea placeholder="Testimony text..." value={testimony} onChange={e => setTestimony(e.target.value)} rows={4} />
+        <div className="flex gap-2">
+          <Button onClick={handleSave} size="sm">
+            {editingId ? <><Save className="h-4 w-4 mr-1" /> Update</> : <><Plus className="h-4 w-4 mr-1" /> Add Testimony</>}
+          </Button>
+          {editingId && <Button variant="outline" size="sm" onClick={resetForm}>Cancel</Button>}
+        </div>
+      </div>
+
+      {testimonies.map(t => (
+        <div key={t.id} className="bg-card rounded-xl p-4 border border-border">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <h4 className="font-semibold">{t.name}</h4>
+                <span className={`text-xs px-2 py-0.5 rounded ${t.approved ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}`}>
+                  {t.approved ? "Published" : "Pending"}
+                </span>
+              </div>
+              {t.contact && <p className="text-xs text-muted-foreground mb-1">{t.contact}</p>}
+              <p className="text-sm text-muted-foreground line-clamp-2">{t.testimony}</p>
+            </div>
+            <div className="flex items-center gap-1">
+              <Button size="sm" variant="ghost" onClick={() => toggleApproval(t.id, t.approved)}>
+                {t.approved ? <X className="h-4 w-4 text-yellow-600" /> : <Check className="h-4 w-4 text-green-600" />}
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => startEdit(t)}>
+                <Edit className="h-4 w-4 text-primary" />
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => handleDelete(t.id)}>
+                <Trash2 className="h-4 w-4 text-destructive" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function CommunityPanel() {
+  const [profiles, setProfiles] = useState<any[]>([]);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    supabase.from("profiles").select("*").order("created_at", { ascending: false }).then(({ data }) => {
+      if (data) setProfiles(data);
+    });
+  }, []);
+
+  const toggleApproval = async (userId: string, currentApproved: boolean) => {
+    const { error } = await supabase.from("profiles").update({ approved: !currentApproved }).eq("user_id", userId);
+    if (!error) {
+      setProfiles(profiles.map(p => p.user_id === userId ? { ...p, approved: !currentApproved } : p));
+      toast({ title: currentApproved ? "User access revoked" : "User approved for community" });
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="bg-card rounded-xl p-4 border border-border mb-4">
+        <p className="text-sm text-muted-foreground">
+          Approve or revoke community access for registered users. Approved users can access channels, DMs, and the opportunity board.
+        </p>
+      </div>
+      {profiles.length === 0 && <p className="text-muted-foreground">No registered users yet.</p>}
+      {profiles.map(p => (
+        <div key={p.id} className="bg-card rounded-xl p-4 border border-border flex items-center justify-between">
+          <div>
+            <h4 className="font-semibold">{p.display_name || "Unnamed User"}</h4>
+            <p className="text-xs text-muted-foreground">User ID: {p.user_id.slice(0, 8)}... · Joined: {new Date(p.created_at).toLocaleDateString()}</p>
+          </div>
+          <Button
+            size="sm"
+            variant={p.approved ? "outline" : "default"}
+            onClick={() => toggleApproval(p.user_id, p.approved)}
+          >
+            {p.approved ? (
+              <><X className="h-4 w-4 mr-1" /> Revoke</>
+            ) : (
+              <><Check className="h-4 w-4 mr-1" /> Approve</>
+            )}
+          </Button>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function SettingsPanel() {
+  const [applicationLink, setApplicationLink] = useState("");
+  const [saved, setSaved] = useState(false);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    supabase.from("site_settings").select("*").eq("key", "dss_application_link").single().then(({ data }) => {
+      if (data) setApplicationLink(data.value || "");
+    });
+  }, []);
+
+  const saveLink = async () => {
+    const { data: existing } = await supabase.from("site_settings").select("id").eq("key", "dss_application_link").single();
+    if (existing) {
+      await supabase.from("site_settings").update({ value: applicationLink }).eq("key", "dss_application_link");
+    } else {
+      await supabase.from("site_settings").insert({ key: "dss_application_link", value: applicationLink });
+    }
+    toast({ title: "Application link saved" });
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="bg-card rounded-xl p-6 border border-border space-y-4">
+        <h3 className="font-semibold">DSS Application Form Link</h3>
+        <p className="text-sm text-muted-foreground">
+          Set the external application form URL. This is where applicants will be redirected to apply and pay the LE 250 fee.
+        </p>
+        <Input
+          placeholder="https://forms.google.com/... or any external form link"
+          value={applicationLink}
+          onChange={e => setApplicationLink(e.target.value)}
+        />
+        <Button onClick={saveLink} size="sm">
+          <Save className="h-4 w-4 mr-1" /> {saved ? "Saved!" : "Save Link"}
+        </Button>
+      </div>
     </div>
   );
 }

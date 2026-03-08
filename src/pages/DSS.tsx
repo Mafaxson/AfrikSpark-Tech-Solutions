@@ -290,70 +290,28 @@ export default function DSS() {
         </div>
       </Section>
 
-      {/* Application Form */}
+      {/* Application */}
       <Section alt id="apply">
-        <SectionHeader badge="Join Us" title="Apply for DSS" description="Fill out the form below to apply for our next cohort. It only takes 5 minutes." />
+        <SectionHeader badge="Join Us" title="Apply for DSS" description="Ready to start your journey? Apply now through our application form." />
         <div className="max-w-2xl mx-auto">
-          <form onSubmit={handleSubmit} className="bg-card rounded-xl p-8 border border-border space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium mb-1.5 block">Full Name</label>
-                <Input name="name" required placeholder="Your full name" />
-              </div>
-              <div>
-                <label className="text-sm font-medium mb-1.5 block">Email</label>
-                <Input name="email" type="email" required placeholder="your@email.com" />
-              </div>
-              <div>
-                <label className="text-sm font-medium mb-1.5 block">Phone</label>
-                <Input name="phone" required placeholder="+232..." />
-              </div>
-              <div>
-                <label className="text-sm font-medium mb-1.5 block">City</label>
-                <Input name="city" required placeholder="Your city" />
-              </div>
-              <div>
-                <label className="text-sm font-medium mb-1.5 block">Age</label>
-                <Input name="age" type="number" required placeholder="Your age" min={15} max={40} />
-              </div>
-              <div>
-                <label className="text-sm font-medium mb-1.5 block">Education Level</label>
-                <Select name="education" required>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select level" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="ssce">SSCE / WASSCE</SelectItem>
-                    <SelectItem value="diploma">Diploma</SelectItem>
-                    <SelectItem value="some-university">Some University</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+          <div className="bg-card rounded-xl p-8 border border-border text-center space-y-6">
+            <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+              <GraduationCap className="h-8 w-8 text-primary" />
             </div>
             <div>
-              <label className="text-sm font-medium mb-1.5 block">Skill Interest</label>
-              <Select name="skill_interest" required>
-                <SelectTrigger>
-                  <SelectValue placeholder="Which skill interests you?" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="content-creation">Content Creation</SelectItem>
-                  <SelectItem value="graphic-design">Graphic Design</SelectItem>
-                  <SelectItem value="videography">Videography</SelectItem>
-                  <SelectItem value="photography">Photography</SelectItem>
-                  <SelectItem value="web-dev">Web & App Development</SelectItem>
-                </SelectContent>
-              </Select>
+              <h3 className="font-display text-xl font-bold mb-2">Application Fee: LE 250</h3>
+              <p className="text-muted-foreground">
+                A small application fee of <span className="font-semibold text-foreground">LE 250</span> is required to process your application. 
+                This helps us manage the selection process and ensure serious applicants.
+              </p>
             </div>
-            <div>
-              <label className="text-sm font-medium mb-1.5 block">Why do you want to join DSS?</label>
-              <Textarea name="motivation" required placeholder="Tell us about yourself and your goals..." rows={4} />
+            <div className="space-y-3">
+              <ApplicationButton />
+              <p className="text-xs text-muted-foreground">
+                You will be redirected to an external form where you can complete your application and make payment.
+              </p>
             </div>
-            <Button type="submit" className="w-full" size="lg" disabled={loading}>
-              {loading ? "Submitting..." : "Submit Application"}
-            </Button>
-          </form>
+          </div>
         </div>
       </Section>
     </Layout>
