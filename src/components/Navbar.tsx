@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import logo from "@/assets/afrikspark-logo.jpeg";
 
 const navItems = [
   { label: "Home", path: "/" },
@@ -38,8 +39,8 @@ export function Navbar() {
       scrolled ? "glass shadow-sm" : "bg-transparent"
     )}>
       <div className="container mx-auto flex items-center justify-between h-16 px-4">
-        <Link to="/" className="font-display text-xl font-bold text-foreground">
-          Afrik<span className="text-gradient">Spark</span>
+        <Link to="/" className="flex items-center">
+          <img src={logo} alt="AfrikSpark Tech Solutions" className="h-10 w-auto" />
         </Link>
 
         {/* Desktop nav */}
