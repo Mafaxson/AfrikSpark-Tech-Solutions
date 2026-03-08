@@ -21,6 +21,8 @@ export function ChannelView({ channelId, onViewProfile }: Props) {
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [profileMap, setProfileMap] = useState<Record<string, any>>({});
+
   useEffect(() => {
     if (!channelId) return;
     
@@ -28,24 +30,44 @@ export function ChannelView({ channelId, onViewProfile }: Props) {
       if (data) setChannel(data);
     });
 
-    supabase.from("messages")
-      .select("*")
-      .eq("channel_id", channelId)
-      .order("created_at", { ascending: true })
-      .limit(200)
-      .then(({ data }) => { if (data) setMessages(data); });
+    const loadMessages = async () => {
+      const { data: msgs } = await supabase.from("messages")
+        .select("*")
+        .eq("channel_id", channelId)
+        .order("created_at", { ascending: true })
+        .limit(200);
+      if (msgs) {
+        setMessages(msgs);
+        const userIds = [...new Set(msgs.map(m => m.user_id))];
+        if (userIds.length > 0) {
+          const { data: profiles } = await supabase.from("profiles")
+            .select("user_id, display_name, avatar_url")
+            .in("user_id", userIds);
+          if (profiles) {
+            const map: Record<string, any> = {};
+            profiles.forEach(p => { map[p.user_id] = p; });
+            setProfileMap(map);
+          }
+        }
+      }
+    };
+    loadMessages();
 
     const sub = supabase.channel(`channel-${channelId}`)
       .on("postgres_changes", {
         event: "INSERT", schema: "public", table: "messages",
         filter: `channel_id=eq.${channelId}`,
       }, async (payload) => {
-        // Fetch the profile for the new message
-        const { data: profile } = await supabase.from("profiles")
-          .select("display_name, avatar_url, user_id")
-          .eq("user_id", (payload.new as any).user_id)
-          .single();
-        setMessages(prev => [...prev, { ...payload.new, profiles: profile }]);
+        const newMsg = payload.new as any;
+        // Fetch profile if not cached
+        if (!profileMap[newMsg.user_id]) {
+          const { data: profile } = await supabase.from("profiles")
+            .select("user_id, display_name, avatar_url")
+            .eq("user_id", newMsg.user_id)
+            .single();
+          if (profile) setProfileMap(prev => ({ ...prev, [profile.user_id]: profile }));
+        }
+        setMessages(prev => [...prev, newMsg]);
       })
       .subscribe();
 
