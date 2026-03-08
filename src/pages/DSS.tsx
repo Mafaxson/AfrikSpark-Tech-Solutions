@@ -207,7 +207,7 @@ export default function DSS() {
               <AnimateOnScroll key={cohort.id}>
                 <div className="bg-card rounded-xl border border-border p-8">
                   <div className="flex items-center gap-3 mb-2">
-                    <Calendar className="h-5 w-5 text-primary" />
+                    <BookOpen className="h-5 w-5 text-primary" />
                     <h3 className="font-display text-2xl font-bold">{cohort.name}</h3>
                     <span className="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full font-medium">{cohort.year}</span>
                   </div>
