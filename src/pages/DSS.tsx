@@ -143,8 +143,38 @@ export default function DSS() {
         </div>
       </Section>
 
+      {/* Eligibility Criteria */}
+      <Section alt id="eligibility">
+        <SectionHeader badge="Who Can Apply?" title="Eligibility Criteria" description="Make sure you meet the following requirements before applying." />
+        <div className="max-w-3xl mx-auto">
+          <AnimateOnScroll>
+            <div className="bg-card rounded-xl border border-border p-8">
+              <ul className="space-y-4">
+                {[
+                  "Must be between 16 and 35 years old.",
+                  "Must have completed high school (SSCE/WASSCE or equivalent).",
+                  "Unable to attend university due to financial constraints.",
+                  "Must be a resident of Sierra Leone.",
+                  "Must have access to a smartphone or computer (we can help with this).",
+                  "Must be committed to attending the full 6-month training program.",
+                  "No prior experience in digital skills required — just passion and willingness to learn.",
+                  "Must be available for in-person or virtual training sessions as scheduled.",
+                ].map((item, i) => (
+                  <li key={i} className="flex items-start gap-3">
+                    <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Star className="h-3 w-3 text-primary" />
+                    </div>
+                    <span className="text-muted-foreground">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </AnimateOnScroll>
+        </div>
+      </Section>
+
       {/* Why Join DSS */}
-      <Section alt>
+      <Section>
         <SectionHeader badge="Why Join?" title="Why You Should Apply for DSS" description="Here's what makes our program different from anything else out there." />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {whyJoin.map((item, i) => (
