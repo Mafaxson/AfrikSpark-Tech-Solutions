@@ -99,7 +99,7 @@ export default function VentureStudio() {
             </div>
             <div>
               <label className="text-sm font-medium mb-1.5 block">Your Solution</label>
-              <Textarea required placeholder="Describe your solution..." rows={3} />
+              <Textarea name="solution" required placeholder="Describe your solution..." rows={3} />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
