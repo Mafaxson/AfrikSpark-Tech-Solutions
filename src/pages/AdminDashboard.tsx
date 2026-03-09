@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Navigate } from "react-router-dom";
+import { BlogManagement } from "@/components/admin/BlogManagement";
 import {
   Users, FileText, MessageSquare, GraduationCap, BookOpen, Mail,
   Check, X, Plus, Trash2, Edit, Star, UserCheck, Link as LinkIcon, Save,
