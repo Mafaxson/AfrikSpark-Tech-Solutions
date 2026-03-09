@@ -14,33 +14,126 @@ export type Database = {
   }
   public: {
     Tables: {
+      blog_categories: {
+        Row: {
+          category_name: string
+          created_at: string | null
+          description: string | null
+          id: string
+          slug: string
+        }
+        Insert: {
+          category_name: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          slug: string
+        }
+        Update: {
+          category_name?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          slug?: string
+        }
+        Relationships: []
+      }
+      blog_comments: {
+        Row: {
+          blog_id: string
+          comment: string
+          created_at: string | null
+          id: string
+          parent_id: string | null
+          user_id: string
+        }
+        Insert: {
+          blog_id: string
+          comment: string
+          created_at?: string | null
+          id?: string
+          parent_id?: string | null
+          user_id: string
+        }
+        Update: {
+          blog_id?: string
+          comment?: string
+          created_at?: string | null
+          id?: string
+          parent_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blog_comments_blog_id_fkey"
+            columns: ["blog_id"]
+            isOneToOne: false
+            referencedRelation: "blog_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "blog_comments_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "blog_comments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       blog_posts: {
         Row: {
+          author_id: string | null
           category: string | null
           content: string | null
           created_at: string | null
+          excerpt: string | null
           id: string
           image_url: string | null
+          meta_description: string | null
+          published_at: string | null
+          reading_time: number | null
+          seo_title: string | null
           slug: string
+          status: string | null
+          tags: string[] | null
           title: string
+          views: number | null
         }
         Insert: {
+          author_id?: string | null
           category?: string | null
           content?: string | null
           created_at?: string | null
+          excerpt?: string | null
           id?: string
           image_url?: string | null
+          meta_description?: string | null
+          published_at?: string | null
+          reading_time?: number | null
+          seo_title?: string | null
           slug: string
+          status?: string | null
+          tags?: string[] | null
           title: string
+          views?: number | null
         }
         Update: {
+          author_id?: string | null
           category?: string | null
           content?: string | null
           created_at?: string | null
+          excerpt?: string | null
           id?: string
           image_url?: string | null
+          meta_description?: string | null
+          published_at?: string | null
+          reading_time?: number | null
+          seo_title?: string | null
           slug?: string
+          status?: string | null
+          tags?: string[] | null
           title?: string
+          views?: number | null
         }
         Relationships: []
       }
@@ -430,6 +523,27 @@ export type Database = {
           },
         ]
       }
+      newsletter_subscribers: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          subscribed: boolean | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: string
+          subscribed?: boolean | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          subscribed?: boolean | null
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           body: string | null
@@ -795,6 +909,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculate_reading_time: {
+        Args: { content_text: string }
+        Returns: number
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
