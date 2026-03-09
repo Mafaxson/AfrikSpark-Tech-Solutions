@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Navigate } from "react-router-dom";
 import { BlogManagement } from "@/components/admin/BlogManagement";
+import { TestimonialManagement } from "@/components/admin/TestimonialManagement";
 import {
   Users, FileText, MessageSquare, GraduationCap, BookOpen, Mail,
   Check, X, Plus, Trash2, Edit, Star, UserCheck, Link as LinkIcon, Save,
@@ -269,60 +270,7 @@ function MessagesPanel() {
 
 // ===== TESTIMONIES =====
 function TestimoniesPanel() {
-  const [testimonies, setTestimonies] = useState<any[]>([]);
-  const [name, setName] = useState(""); const [contact, setContact] = useState(""); const [testimony, setTestimony] = useState("");
-  const [imageUrl, setImageUrl] = useState(""); const [videoUrl, setVideoUrl] = useState(""); const [editingId, setEditingId] = useState<string | null>(null);
-  const { toast } = useToast();
-  const fetchTestimonies = () => { supabase.from("testimonies").select("*").order("created_at", { ascending: false }).then(({ data }) => { if (data) setTestimonies(data); }); };
-  useEffect(() => { fetchTestimonies(); }, []);
-  const resetForm = () => { setName(""); setContact(""); setTestimony(""); setImageUrl(""); setVideoUrl(""); setEditingId(null); };
-  const handleSave = async () => {
-    if (!name || !testimony) return;
-    const payload = { name, contact: contact || null, testimony, image_url: imageUrl || null, video_url: videoUrl || null, approved: true };
-    if (editingId) { await supabase.from("testimonies").update(payload).eq("id", editingId); toast({ title: "Testimony updated" }); }
-    else { await supabase.from("testimonies").insert(payload); toast({ title: "Testimony added" }); }
-    resetForm(); fetchTestimonies();
-  };
-  const startEdit = (t: any) => { setEditingId(t.id); setName(t.name); setContact(t.contact || ""); setTestimony(t.testimony); setImageUrl(t.image_url || ""); setVideoUrl(t.video_url || ""); };
-  const handleDelete = async (id: string) => { await supabase.from("testimonies").delete().eq("id", id); toast({ title: "Testimony deleted" }); fetchTestimonies(); };
-  const toggleApproval = async (id: string, current: boolean) => { await supabase.from("testimonies").update({ approved: !current }).eq("id", id); toast({ title: current ? "Testimony hidden" : "Testimony approved" }); fetchTestimonies(); };
-  return (
-    <div className="space-y-6">
-      <div className="bg-card rounded-xl p-6 border border-border space-y-4">
-        <h3 className="font-semibold">{editingId ? "Edit Testimony" : "Add Testimony"}</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Input placeholder="Person's name" value={name} onChange={e => setName(e.target.value)} />
-          <Input placeholder="Contact (email/phone)" value={contact} onChange={e => setContact(e.target.value)} />
-          <Input placeholder="Image URL (optional)" value={imageUrl} onChange={e => setImageUrl(e.target.value)} />
-          <Input placeholder="Video URL (optional)" value={videoUrl} onChange={e => setVideoUrl(e.target.value)} />
-        </div>
-        <Textarea placeholder="Testimony text..." value={testimony} onChange={e => setTestimony(e.target.value)} rows={4} />
-        <div className="flex gap-2">
-          <Button onClick={handleSave} size="sm">{editingId ? <><Save className="h-4 w-4 mr-1" /> Update</> : <><Plus className="h-4 w-4 mr-1" /> Add Testimony</>}</Button>
-          {editingId && <Button variant="outline" size="sm" onClick={resetForm}>Cancel</Button>}
-        </div>
-      </div>
-      {testimonies.map(t => (
-        <div key={t.id} className="bg-card rounded-xl p-4 border border-border">
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-1">
-                <h4 className="font-semibold">{t.name}</h4>
-                <span className={`text-xs px-2 py-0.5 rounded ${t.approved ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}`}>{t.approved ? "Published" : "Pending"}</span>
-              </div>
-              {t.contact && <p className="text-xs text-muted-foreground mb-1">{t.contact}</p>}
-              <p className="text-sm text-muted-foreground line-clamp-2">{t.testimony}</p>
-            </div>
-            <div className="flex items-center gap-1">
-              <Button size="sm" variant="ghost" onClick={() => toggleApproval(t.id, t.approved)}>{t.approved ? <X className="h-4 w-4 text-yellow-600" /> : <Check className="h-4 w-4 text-green-600" />}</Button>
-              <Button size="sm" variant="ghost" onClick={() => startEdit(t)}><Edit className="h-4 w-4 text-primary" /></Button>
-              <Button size="sm" variant="ghost" onClick={() => handleDelete(t.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
+  return <TestimonialManagement />;
 }
 
 // ===== COMMUNITY (Member Approvals) =====

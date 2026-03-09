@@ -853,34 +853,73 @@ export type Database = {
           },
         ]
       }
+      testimonial_categories: {
+        Row: {
+          category_name: string
+          created_at: string | null
+          description: string | null
+          id: string
+        }
+        Insert: {
+          category_name: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+        }
+        Update: {
+          category_name?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
       testimonies: {
         Row: {
           approved: boolean
+          cohort: string | null
           contact: string | null
           created_at: string | null
+          email: string | null
+          featured: boolean | null
           id: string
           image_url: string | null
           name: string
+          organization: string | null
+          role: string | null
+          status: string | null
           testimony: string
           video_url: string | null
         }
         Insert: {
           approved?: boolean
+          cohort?: string | null
           contact?: string | null
           created_at?: string | null
+          email?: string | null
+          featured?: boolean | null
           id?: string
           image_url?: string | null
           name: string
+          organization?: string | null
+          role?: string | null
+          status?: string | null
           testimony: string
           video_url?: string | null
         }
         Update: {
           approved?: boolean
+          cohort?: string | null
           contact?: string | null
           created_at?: string | null
+          email?: string | null
+          featured?: boolean | null
           id?: string
           image_url?: string | null
           name?: string
+          organization?: string | null
+          role?: string | null
+          status?: string | null
           testimony?: string
           video_url?: string | null
         }
