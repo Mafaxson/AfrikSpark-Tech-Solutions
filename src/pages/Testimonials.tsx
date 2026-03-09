@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Layout } from "@/components/Layout";
 import { Card } from "@/components/ui/card";
@@ -8,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Quote, Search, Star, Video } from "lucide-react";
+import { Quote, Search, Star, Video, Plus } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface Testimonial {
