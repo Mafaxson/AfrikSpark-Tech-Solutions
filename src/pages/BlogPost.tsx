@@ -5,13 +5,13 @@ import { AnimateOnScroll } from "@/components/SectionComponents";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Calendar, Clock, Eye, Share2 } from "lucide-react";
+import { Calendar, Clock, Eye } from "lucide-react";
 import { format } from "date-fns";
 import { BlogComments } from "@/components/blog/BlogComments";
 import { RelatedArticles } from "@/components/blog/RelatedArticles";
 import { NewsletterSubscription } from "@/components/blog/NewsletterSubscription";
 import { SocialShare } from "@/components/blog/SocialShare";
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 import { toast } from "sonner";
 
 interface BlogPost {

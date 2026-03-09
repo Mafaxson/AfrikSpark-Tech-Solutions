@@ -29,13 +29,10 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Pencil, Trash2, Plus, Upload } from "lucide-react";
+import { Pencil, Trash2, Plus } from "lucide-react";
 import { format } from "date-fns";
-import dynamic from "next/dynamic";
+import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-
-// Dynamically import React Quill to avoid SSR issues
-const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 
 interface BlogPost {
   id: string;
