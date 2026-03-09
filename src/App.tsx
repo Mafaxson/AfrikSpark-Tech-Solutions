@@ -13,6 +13,7 @@ import Impact from "./pages/Impact";
 import Partners from "./pages/Partners";
 import VentureStudio from "./pages/VentureStudio";
 import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
 import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import AdminDashboard from "./pages/AdminDashboard";
