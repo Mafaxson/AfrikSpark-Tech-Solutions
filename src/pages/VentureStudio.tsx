@@ -25,19 +25,28 @@ export default function VentureStudio() {
     setLoading(true);
     const form = e.target as HTMLFormElement;
     const formData = new FormData(form);
-    const { error } = await supabase.from("startups").insert({
+    const startupData = {
       founder_name: formData.get("founder") as string,
       startup_name: formData.get("startup") as string,
       problem: formData.get("problem") as string,
       solution: formData.get("solution") as string,
       stage: formData.get("stage") as string,
       website: formData.get("website") as string || null,
-    });
+    };
+
+    const { error } = await supabase.from("startups").insert(startupData);
     if (error) {
       toast({ title: "Error", description: "Something went wrong.", variant: "destructive" });
     } else {
       toast({ title: "Application Submitted!", description: "We'll review and reach out." });
       form.reset();
+      // Notify admin
+      supabase.functions.invoke("notify-admin", { 
+        body: { 
+          type: "startup_submission", 
+          data: startupData 
+        } 
+      });
     }
     setLoading(false);
   };
