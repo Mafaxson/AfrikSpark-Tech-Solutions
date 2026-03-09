@@ -246,34 +246,7 @@ function StudentsPanel() {
 
 // ===== BLOG =====
 function BlogPanel() {
-  const [posts, setPosts] = useState<any[]>([]); const [title, setTitle] = useState(""); const [content, setContent] = useState(""); const [category, setCategory] = useState("");
-  const { toast } = useToast();
-  useEffect(() => { supabase.from("blog_posts").select("*").order("created_at", { ascending: false }).then(({ data }) => { if (data) setPosts(data); }); }, []);
-  const addPost = async () => {
-    if (!title) return;
-    const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-    const { data, error } = await supabase.from("blog_posts").insert({ title, slug, content, category }).select().single();
-    if (data) { setPosts([data, ...posts]); setTitle(""); setContent(""); setCategory(""); toast({ title: "Post created" }); }
-    if (error) toast({ title: "Error", description: error.message, variant: "destructive" });
-  };
-  const deletePost = async (id: string) => { await supabase.from("blog_posts").delete().eq("id", id); setPosts(posts.filter(p => p.id !== id)); toast({ title: "Post deleted" }); };
-  return (
-    <div className="space-y-6">
-      <div className="bg-card rounded-xl p-6 border border-border space-y-4">
-        <h3 className="font-semibold">Create Blog Post</h3>
-        <Input placeholder="Title" value={title} onChange={e => setTitle(e.target.value)} />
-        <Input placeholder="Category" value={category} onChange={e => setCategory(e.target.value)} />
-        <Textarea placeholder="Content..." value={content} onChange={e => setContent(e.target.value)} rows={6} />
-        <Button onClick={addPost} size="sm"><Plus className="h-4 w-4 mr-1" /> Publish Post</Button>
-      </div>
-      {posts.map(p => (
-        <div key={p.id} className="bg-card rounded-xl p-4 border border-border flex items-center justify-between">
-          <div><h4 className="font-semibold">{p.title}</h4><p className="text-sm text-muted-foreground">{p.category} · {new Date(p.created_at).toLocaleDateString()}</p></div>
-          <Button size="sm" variant="ghost" onClick={() => deletePost(p.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
-        </div>
-      ))}
-    </div>
-  );
+  return <BlogManagement />;
 }
 
 // ===== MESSAGES =====
