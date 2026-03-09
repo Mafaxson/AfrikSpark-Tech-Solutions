@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Layout } from "@/components/Layout";
 import { Section, SectionHeader, AnimateOnScroll, StatCounter } from "@/components/SectionComponents";
+import { TestimonialsSection } from "@/components/testimonials/TestimonialsSection";
 import { ArrowRight, Sparkles, Code, Palette, Video, TrendingUp, Users, Globe } from "lucide-react";
 
 const services = [
