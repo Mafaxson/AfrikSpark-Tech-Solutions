@@ -188,9 +188,15 @@ const Testimonials = () => {
               <h1 className="text-4xl md:text-5xl font-bold mb-4">
                 Success Stories & Testimonials
               </h1>
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-6">
                 Hear from our students, alumni, partners, and community members about their transformative experiences
               </p>
+              <Link to="/submit-testimonial">
+                <Button size="lg" className="mt-4">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Share Your Story
+                </Button>
+              </Link>
             </motion.div>
           </div>
         </section>
