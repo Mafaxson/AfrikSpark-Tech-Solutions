@@ -101,6 +101,9 @@ export default function Home() {
         </div>
       </Section>
 
+      {/* Testimonials */}
+      <TestimonialsSection />
+
       {/* CTA */}
       <Section>
         <div className="bg-hero rounded-2xl p-10 md:p-16 text-center relative overflow-hidden">

@@ -270,6 +270,8 @@ function MessagesPanel() {
 
 // ===== TESTIMONIES =====
 function TestimoniesPanel() {
+  return <TestimonialManagement />;
+}
   const [testimonies, setTestimonies] = useState<any[]>([]);
   const [name, setName] = useState(""); const [contact, setContact] = useState(""); const [testimony, setTestimony] = useState("");
   const [imageUrl, setImageUrl] = useState(""); const [videoUrl, setVideoUrl] = useState(""); const [editingId, setEditingId] = useState<string | null>(null);
