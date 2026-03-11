@@ -25,7 +25,13 @@ export default function Login() {
     if (isLogin) {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
-        toast({ title: "Login Failed", description: error.message, variant: "destructive" });
+        const details = [error.message, error.details, error.hint].filter(Boolean).join(" - ");
+        toast({
+          title: "Login Failed",
+          description: details || "Unknown error",
+          variant: "destructive",
+        });
+        console.error("Supabase login error", error);
       } else {
         toast({ title: "Welcome back!" });
 
@@ -34,8 +40,8 @@ export default function Login() {
           // Grant admin role to the configured super admin email on first login.
           try {
             await supabase.rpc("grant_admin");
-          } catch {
-            // ignore if the function doesn't exist or fails
+          } catch (err) {
+            console.warn("grant_admin RPC failed", err);
           }
         }
 
