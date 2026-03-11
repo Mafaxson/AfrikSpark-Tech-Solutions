@@ -28,6 +28,17 @@ export default function Login() {
         toast({ title: "Login Failed", description: error.message, variant: "destructive" });
       } else {
         toast({ title: "Welcome back!" });
+
+        const superAdminEmail = import.meta.env.VITE_SUPABASE_SUPER_ADMIN_EMAIL;
+        if (superAdminEmail && email.toLowerCase() === superAdminEmail.toLowerCase()) {
+          // Grant admin role to the configured super admin email on first login.
+          try {
+            await supabase.rpc("grant_admin");
+          } catch {
+            // ignore if the function doesn't exist or fails
+          }
+        }
+
         // Check if admin
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {

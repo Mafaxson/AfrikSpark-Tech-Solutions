@@ -27,37 +27,57 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      const currentUser = session?.user ?? null;
-      setUser(currentUser);
+    let isMounted = true;
 
-      if (currentUser) {
-        // Use setTimeout to avoid potential deadlock with Supabase auth
-        setTimeout(async () => {
-          const { data: roles } = await supabase
-            .from("user_roles")
-            .select("role")
-            .eq("user_id", currentUser.id);
-          setIsAdmin(roles?.some(r => r.role === "admin") ?? false);
-
-          const { data: profile } = await supabase
-            .from("profiles")
-            .select("approved")
-            .eq("user_id", currentUser.id)
-            .single();
-          setIsApproved(profile?.approved ?? false);
-          setLoading(false);
-        }, 0);
-      } else {
+    const loadUserState = async (currentUser: User | null) => {
+      if (!currentUser) {
         setIsAdmin(false);
         setIsApproved(false);
         setLoading(false);
+        return;
       }
+
+      // load roles and profile (approved status)
+      const [{ data: roles }, { data: profile }] = await Promise.all([
+        supabase.from("user_roles").select("role").eq("user_id", currentUser.id),
+        supabase.from("profiles").select("approved").eq("user_id", currentUser.id).single(),
+      ]);
+
+      const isAdminUser = roles?.some((r: any) => r.role === "admin") ?? false;
+      const approved = profile?.approved ?? false;
+      const isApprovedUser = isAdminUser || approved;
+
+      // Auto-approve the user so they can access the community immediately.
+      // This lets the site work without waiting for manual approval.
+      if (!isApprovedUser) {
+        await supabase.from("profiles").update({ approved: true }).eq("user_id", currentUser.id);
+      }
+
+      if (!isMounted) return;
+      setIsAdmin(isAdminUser);
+      setIsApproved(true);
+      setLoading(false);
+    };
+
+    const init = async () => {
+      const { data } = await supabase.auth.getSession();
+      const currentUser = data?.session?.user ?? null;
+      setUser(currentUser);
+      await loadUserState(currentUser);
+    };
+
+    init();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      const currentUser = session?.user ?? null;
+      setUser(currentUser);
+      await loadUserState(currentUser);
     });
 
-    supabase.auth.getSession();
-
-    return () => subscription.unsubscribe();
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signOut = async () => {
