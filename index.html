@@ -25,6 +25,21 @@
 
   <body>
     <div id="root"></div>
+
+    <!--
+      Runtime environment variables (for hosts that don't rebuild with .env). 
+      Set these values manually when deploying (e.g. on Hostinger) to avoid "missing env vars" errors.
+    -->
+    <script>
+      window.__ENV__ = window.__ENV__ || {
+        // Set these values to match your Supabase project.
+        // If you are deploying to a static host, update these before uploading.
+        VITE_SUPABASE_URL: "https://<your-project-id>.supabase.co",
+        VITE_SUPABASE_PUBLISHABLE_KEY: "<your-anon-key>",
+        VITE_SUPABASE_SUPER_ADMIN_EMAIL: "ismealkamara20@gmail.com",
+      };
+    </script>
+
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
