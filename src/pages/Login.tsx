@@ -25,10 +25,9 @@ export default function Login() {
     if (isLogin) {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
-        const details = [error.message, error.details, error.hint].filter(Boolean).join(" - ");
         toast({
           title: "Login Failed",
-          description: details || "Unknown error",
+          description: error.message || "Unknown error",
           variant: "destructive",
         });
         console.error("Supabase login error", error);
