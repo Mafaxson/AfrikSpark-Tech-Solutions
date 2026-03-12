@@ -25,10 +25,9 @@ export default function Login() {
     if (isLogin) {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
-        const details = [error.message, error.details, error.hint].filter(Boolean).join(" - ");
         toast({
           title: "Login Failed",
-          description: details || "Unknown error",
+          description: error.message || "Unknown error",
           variant: "destructive",
         });
         console.error("Supabase login error", error);
@@ -36,15 +35,6 @@ export default function Login() {
         toast({ title: "Welcome back!" });
 
         const superAdminEmail = import.meta.env.VITE_SUPABASE_SUPER_ADMIN_EMAIL;
-        if (superAdminEmail && email.toLowerCase() === superAdminEmail.toLowerCase()) {
-          // Grant admin role to the configured super admin email on first login.
-          try {
-            await supabase.rpc("grant_admin");
-          } catch (err) {
-            console.warn("grant_admin RPC failed", err);
-          }
-        }
-
         // Check if admin
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
