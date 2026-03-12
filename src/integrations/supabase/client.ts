@@ -10,11 +10,13 @@ const runtimeEnv = (window as unknown as { __ENV__?: Record<string, string> })._
 export const SUPABASE_URL =
   import.meta.env.VITE_SUPABASE_URL ||
   runtimeEnv.VITE_SUPABASE_URL ||
-  "";
+  "https://orawutpfztsglqkhqqbg.supabase.co";
 export const SUPABASE_PUBLISHABLE_KEY =
   import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
+  import.meta.env.VITE_SUPABASE_ANON_KEY ||
   runtimeEnv.VITE_SUPABASE_PUBLISHABLE_KEY ||
-  "";
+  runtimeEnv.VITE_SUPABASE_ANON_KEY ||
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yYXd1dHBmenRzZ2xxa2hxcWJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5MzQxMjUsImV4cCI6MjA4ODUxMDEyNX0.Oq2ULJh6iEkIc1MtTQZTv7_4q5-sF_Hw0ICfS_khUEQ";
 
 export const isSupabaseConfigured = Boolean(SUPABASE_URL && SUPABASE_PUBLISHABLE_KEY);
 
