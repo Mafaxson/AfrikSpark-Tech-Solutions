@@ -35,15 +35,6 @@ export default function Login() {
         toast({ title: "Welcome back!" });
 
         const superAdminEmail = import.meta.env.VITE_SUPABASE_SUPER_ADMIN_EMAIL;
-        if (superAdminEmail && email.toLowerCase() === superAdminEmail.toLowerCase()) {
-          // Grant admin role to the configured super admin email on first login.
-          try {
-            await supabase.rpc("grant_admin");
-          } catch (err) {
-            console.warn("grant_admin RPC failed", err);
-          }
-        }
-
         // Check if admin
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
