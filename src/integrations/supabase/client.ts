@@ -32,19 +32,25 @@ if (!isSupabaseConfigured) {
 }
 
 const createNoopSupabase = () => {
-  const noop = async () => ({ data: null, error: null });
+  const noopResult = { data: null, error: null };
   const noopSubscription = { unsubscribe: () => {} };
 
-  const from = () => ({
-    select: noop,
-    insert: noop,
-    update: noop,
-    delete: noop,
-    single: noop,
-    eq: () => ({ select: noop, single: noop, order: () => ({ select: noop }) }),
-    order: () => ({ select: noop }),
-    in: () => ({ select: noop }),
-  });
+  const createNoopQuery = () => {
+    const chain = {
+      select: () => chain,
+      eq: () => chain,
+      order: () => chain,
+      single: () => chain,
+      in: () => chain,
+      then: (resolve: any) => Promise.resolve(noopResult).then(resolve),
+      catch: (reject: any) => Promise.resolve(noopResult).catch(reject),
+    } as any;
+
+    return chain;
+  };
+
+  const from = () => createNoopQuery();
+  const action = async () => noopResult;
 
   return {
     auth: {
@@ -53,6 +59,9 @@ const createNoopSupabase = () => {
       signOut: async () => ({ data: null, error: null }),
     },
     from,
+    insert: action,
+    update: action,
+    delete: action,
   } as unknown as SupabaseClient<Database>;
 };
 
