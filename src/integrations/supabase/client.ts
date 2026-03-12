@@ -5,7 +5,7 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-const runtimeEnv = (window as unknown as { __ENV__?: Record<string, string> }).__ENV ?? {};
+const runtimeEnv = (window as unknown as { __ENV__?: Record<string, string> }).__ENV__ ?? {};
 
 export const SUPABASE_URL =
   import.meta.env.VITE_SUPABASE_URL ||
