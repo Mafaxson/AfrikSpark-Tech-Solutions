@@ -32,36 +32,73 @@ if (!isSupabaseConfigured) {
 }
 
 const createNoopSupabase = () => {
-  const noopResult = { data: null, error: null };
+  const noopResult = { data: null, error: null, count: null };
   const noopSubscription = { unsubscribe: () => {} };
 
   const createNoopQuery = () => {
-    const chain = {
+    const chain: any = {
       select: () => chain,
+      insert: () => chain,
+      update: () => chain,
+      delete: () => chain,
+      upsert: () => chain,
       eq: () => chain,
-      order: () => chain,
-      single: () => chain,
+      neq: () => chain,
+      gt: () => chain,
+      gte: () => chain,
+      lt: () => chain,
+      lte: () => chain,
+      like: () => chain,
+      ilike: () => chain,
+      is: () => chain,
       in: () => chain,
+      or: () => chain,
+      and: () => chain,
+      not: () => chain,
+      filter: () => chain,
+      match: () => chain,
+      order: () => chain,
+      limit: () => chain,
+      range: () => chain,
+      single: () => chain,
+      maybeSingle: () => chain,
+      csv: () => chain,
       then: (resolve: any) => Promise.resolve(noopResult).then(resolve),
       catch: (reject: any) => Promise.resolve(noopResult).catch(reject),
-    } as any;
-
+    };
     return chain;
   };
 
   const from = () => createNoopQuery();
-  const action = async () => noopResult;
 
   return {
     auth: {
       getSession: async () => ({ data: { session: null }, error: null }),
+      getUser: async () => ({ data: { user: null }, error: null }),
       onAuthStateChange: () => ({ data: { subscription: noopSubscription } }),
       signOut: async () => ({ data: null, error: null }),
+      signInWithPassword: async () => ({ data: null, error: null }),
+      signUp: async () => ({ data: null, error: null }),
     },
     from,
-    insert: action,
-    update: action,
-    delete: action,
+    rpc: async () => noopResult,
+    functions: {
+      invoke: async () => ({ data: null, error: null }),
+    },
+    channel: () => ({
+      on: () => ({ subscribe: () => ({}) }),
+      subscribe: () => ({}),
+    }),
+    removeChannel: async () => {},
+    storage: {
+      from: () => ({
+        upload: async () => ({ data: null, error: null }),
+        getPublicUrl: () => ({ data: { publicUrl: "" } }),
+        download: async () => ({ data: null, error: null }),
+        remove: async () => ({ data: null, error: null }),
+        list: async () => ({ data: null, error: null }),
+      }),
+    },
   } as unknown as SupabaseClient<Database>;
 };
 
