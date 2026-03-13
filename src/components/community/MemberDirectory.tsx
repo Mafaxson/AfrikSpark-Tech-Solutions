@@ -45,10 +45,7 @@ export function MemberDirectory({ onViewProfile, onMessage }: Props) {
   }, [user]);
 
   const getConnectionStatus = (memberId: string) => {
-    const conn = connections.find(c => 
-      (c.requester_id === user?.id && c.receiver_id === memberId) ||
-      (c.receiver_id === user?.id && c.requester_id === memberId)
-    );
+    const conn = connections.find(c => c.requester_id === user?.id && c.receiver_id === memberId || c.receiver_id === user?.id && c.requester_id === memberId);
     return conn?.status ?? null;
   };
 
