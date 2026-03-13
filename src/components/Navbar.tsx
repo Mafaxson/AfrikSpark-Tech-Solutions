@@ -75,7 +75,7 @@ export function Navbar() {
                 <Link to="/community">Community</Link>
               </Button>
               <Button variant="ghost" size="sm" onClick={signOut}>
-                <LogOut className="h-4 w-4 mr-1" /> Sign Out
+                <LogOut className="h-4 w-4 mr-1" /> Logout
               </Button>
             </>
           ) : (

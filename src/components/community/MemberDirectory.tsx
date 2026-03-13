@@ -19,20 +19,29 @@ export function MemberDirectory({ onViewProfile, onMessage }: Props) {
   const [filterCohort, setFilterCohort] = useState("");
   const [filterSkill, setFilterSkill] = useState("");
   const [connections, setConnections] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
   useEffect(() => {
-    supabase.from("profiles").select("*, cohorts(name)").eq("approved", true).order("display_name").then(({ data }) => {
-      if (data) setMembers(data);
-    });
-    supabase.from("cohorts").select("*").order("year", { ascending: false }).then(({ data }) => {
-      if (data) setCohorts(data);
-    });
-    if (user) {
-      supabase.from("connections").select("*")
-        .or(`requester_id.eq.${user.id},receiver_id.eq.${user.id}`)
-        .then(({ data }) => { if (data) setConnections(data); });
-    }
+    const fetchData = async () => {
+      try {
+        const [membersRes, cohortsRes, connectionsRes] = await Promise.all([
+          supabase.from("profiles").select("*, cohorts(name)").eq("approved", true).order("display_name"),
+          supabase.from("cohorts").select("*").order("year", { ascending: false }),
+          user ? supabase.from("connections").select("*").or(`requester_id.eq.${user.id},receiver_id.eq.${user.id}`) : Promise.resolve({ data: [] })
+        ]);
+
+        if (membersRes.data) setMembers(membersRes.data);
+        if (cohortsRes.data) setCohorts(cohortsRes.data);
+        if (connectionsRes.data) setConnections(connectionsRes.data || []);
+      } catch (error) {
+        console.error("Error fetching member directory data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, [user]);
 
   const getConnectionStatus = (memberId: string) => {
@@ -79,6 +88,11 @@ export function MemberDirectory({ onViewProfile, onMessage }: Props) {
 
   return (
     <div className="flex flex-col h-full">
+      {loading ? (
+        <div className="flex-1 flex items-center justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      ) : (
       <div className="p-4 border-b border-border bg-card space-y-3">
         <h2 className="font-display text-xl font-bold">Member Directory</h2>
         <div className="flex flex-wrap gap-2">
@@ -172,5 +186,6 @@ export function MemberDirectory({ onViewProfile, onMessage }: Props) {
         </div>
       </div>
     </div>
+    )}
   );
 }

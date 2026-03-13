@@ -66,6 +66,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const currentUser = data?.session?.user ?? null;
       if (isMounted) setUser(currentUser);
       loadUserState(currentUser);
+    }).catch((error) => {
+      console.error("Error getting initial session:", error);
+      if (isMounted) {
+        setUser(null);
+        setLoading(false);
+      }
     });
 
     return () => {
@@ -75,7 +81,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
   };
 
   return (

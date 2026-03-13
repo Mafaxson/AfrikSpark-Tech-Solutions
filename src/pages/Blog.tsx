@@ -79,21 +79,22 @@ export default function Blog() {
 
       if (error) throw error;
 
-      // Fetch author information for each post
-      const postsWithAuthors = await Promise.all(
-        (data || []).map(async (post) => {
-          if (post.author_id) {
-            const { data: authorData } = await supabase
-              .from("profiles")
-              .select("display_name, avatar_url")
-              .eq("user_id", post.author_id)
-              .single();
+      // Batch fetch author information for all posts
+      const authorIds = (data || []).map(post => post.author_id).filter(Boolean);
+      const { data: authorsData } = await supabase
+        .from("profiles")
+        .select("user_id, display_name, avatar_url")
+        .in("user_id", authorIds);
 
-            return { ...post, author: authorData };
-          }
-          return post;
-        })
-      );
+      const authorsMap = new Map();
+      authorsData?.forEach(author => {
+        authorsMap.set(author.user_id, author);
+      });
+
+      const postsWithAuthors = (data || []).map(post => ({
+        ...post,
+        author: post.author_id ? authorsMap.get(post.author_id) : null
+      }));
 
       // Set featured post (most recent)
       if (postsWithAuthors.length > 0) {

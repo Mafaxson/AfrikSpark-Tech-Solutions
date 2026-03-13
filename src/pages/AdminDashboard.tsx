@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Navigate } from "react-router-dom";
 import { BlogManagement } from "@/components/admin/BlogManagement";
 import { TestimonialManagement } from "@/components/admin/TestimonialManagement";
 import {
@@ -16,14 +15,13 @@ import {
   Hash, Megaphone, Calendar, FolderOpen, Shield, Bell
 } from "lucide-react";
 
-type Tab = "overview" | "applications" | "cohorts" | "students" | "blog" | "messages" | "testimonies" | "community" | "channels" | "events" | "resources" | "settings";
+type Tab = "overview" | "applications" | "cohorts" | "students" | "blog" | "messages" | "testimonies" | "community" | "channels" | "events" | "resources" | "settings" | "partners" | "sponsors";
 
 export default function AdminDashboard() {
-  const { user, isAdmin, loading } = useAuth();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<Tab>("overview");
 
   if (loading) return <Layout><Section><p>Loading...</p></Section></Layout>;
-  if (!user || !isAdmin) return <Navigate to="/login" replace />;
 
   const tabs: { id: Tab; label: string; icon: React.ElementType }[] = [
     { id: "overview", label: "Overview", icon: Users },
@@ -33,6 +31,8 @@ export default function AdminDashboard() {
     { id: "blog", label: "Blog", icon: FileText },
     { id: "messages", label: "Messages", icon: Mail },
     { id: "testimonies", label: "Testimonies", icon: Star },
+    { id: "partners", label: "Partners", icon: Shield },
+    { id: "sponsors", label: "Sponsors", icon: Bell },
     { id: "community", label: "Members", icon: UserCheck },
     { id: "channels", label: "Channels", icon: Hash },
     { id: "events", label: "Events", icon: Calendar },
@@ -65,6 +65,8 @@ export default function AdminDashboard() {
         {activeTab === "blog" && <BlogPanel />}
         {activeTab === "messages" && <MessagesPanel />}
         {activeTab === "testimonies" && <TestimoniesPanel />}
+        {activeTab === "partners" && <PartnersPanel />}
+        {activeTab === "sponsors" && <SponsorsPanel />}
         {activeTab === "community" && <CommunityPanel />}
         {activeTab === "channels" && <ChannelsPanel />}
         {activeTab === "events" && <EventsPanel />}
@@ -78,29 +80,83 @@ export default function AdminDashboard() {
 // ===== OVERVIEW =====
 function OverviewPanel() {
   const [stats, setStats] = useState<Record<string, number>>({});
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const fetchStats = async () => {
-      const [apps, students, cohorts, messages, blogs, testimonies, pending, channels, events, resources] = await Promise.all([
-        supabase.from("dss_applications").select("id", { count: "exact", head: true }),
-        supabase.from("students").select("id", { count: "exact", head: true }),
-        supabase.from("cohorts").select("id", { count: "exact", head: true }),
-        supabase.from("contact_messages").select("id", { count: "exact", head: true }),
-        supabase.from("blog_posts").select("id", { count: "exact", head: true }),
-        supabase.from("testimonies").select("id", { count: "exact", head: true }),
-        supabase.from("profiles").select("id", { count: "exact", head: true }).eq("approved", false),
-        supabase.from("channels").select("id", { count: "exact", head: true }),
-        supabase.from("events").select("id", { count: "exact", head: true }),
-        supabase.from("resources").select("id", { count: "exact", head: true }),
-      ]);
-      setStats({
-        applications: apps.count ?? 0, students: students.count ?? 0, cohorts: cohorts.count ?? 0,
-        messages: messages.count ?? 0, blogs: blogs.count ?? 0, testimonies: testimonies.count ?? 0,
-        pendingApprovals: pending.count ?? 0, channels: channels.count ?? 0, events: events.count ?? 0,
-        resources: resources.count ?? 0,
-      });
+      try {
+        const [apps, students, cohorts, messages, blogs, testimonies, pending, channels, events, resources] = await Promise.all([
+          supabase.from("dss_applications").select("id", { count: "exact", head: true }),
+          supabase.from("students").select("id", { count: "exact", head: true }),
+          supabase.from("cohorts").select("id", { count: "exact", head: true }),
+          supabase.from("contact_messages").select("id", { count: "exact", head: true }),
+          supabase.from("blog_posts").select("id", { count: "exact", head: true }),
+          supabase.from("testimonies").select("id", { count: "exact", head: true }),
+          supabase.from("profiles").select("id", { count: "exact", head: true }).eq("approved", false),
+          supabase.from("channels").select("id", { count: "exact", head: true }),
+          supabase.from("events").select("id", { count: "exact", head: true }),
+          supabase.from("resources").select("id", { count: "exact", head: true }),
+        ]);
+        setStats({
+          applications: apps.count ?? 0, students: students.count ?? 0, cohorts: cohorts.count ?? 0,
+          messages: messages.count ?? 0, blogs: blogs.count ?? 0, testimonies: testimonies.count ?? 0,
+          pendingApprovals: pending.count ?? 0, channels: channels.count ?? 0, events: events.count ?? 0,
+          resources: resources.count ?? 0,
+        });
+      } catch (error) {
+        console.error("Error fetching stats:", error);
+      } finally {
+        setLoading(false);
+      }
     };
     fetchStats();
   }, []);
+
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {Array.from({ length: 10 }).map((_, i) => (
+          <div key={i} className="bg-card rounded-xl p-6 border border-border animate-pulse">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="h-10 w-10 rounded-lg bg-primary/10"></div>
+              <div className="h-4 bg-muted rounded w-20"></div>
+            </div>
+            <div className="h-8 bg-muted rounded w-12"></div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  const cards = [
+    { label: "DSS Applications", value: stats.applications ?? 0, icon: GraduationCap },
+    { label: "Students", value: stats.students ?? 0, icon: Users },
+    { label: "Cohorts", value: stats.cohorts ?? 0, icon: BookOpen },
+    { label: "Channels", value: stats.channels ?? 0, icon: Hash },
+    { label: "Events", value: stats.events ?? 0, icon: Calendar },
+    { label: "Resources", value: stats.resources ?? 0, icon: FolderOpen },
+    { label: "Blog Posts", value: stats.blogs ?? 0, icon: FileText },
+    { label: "Contact Messages", value: stats.messages ?? 0, icon: Mail },
+    { label: "Testimonies", value: stats.testimonies ?? 0, icon: Star },
+    { label: "Pending Approvals", value: stats.pendingApprovals ?? 0, icon: UserCheck },
+  ];
+
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      {cards.map((card) => (
+        <div key={card.label} className="bg-card rounded-xl p-6 border border-border">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+              <card.icon className="h-5 w-5 text-primary" />
+            </div>
+            <span className="text-sm text-muted-foreground">{card.label}</span>
+          </div>
+          <div className="font-display text-3xl font-bold">{card.value}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
 
   const cards = [
     { label: "DSS Applications", value: stats.applications ?? 0, icon: GraduationCap },
@@ -542,7 +598,134 @@ function SettingsPanel() {
         <h3 className="font-semibold">DSS Application Form Link</h3>
         <p className="text-sm text-muted-foreground">Set the external application form URL. This is where applicants will be redirected to apply and pay the LE 250 fee.</p>
         <Input placeholder="https://forms.google.com/... or any external form link" value={applicationLink} onChange={e => setApplicationLink(e.target.value)} />
-        <Button onClick={saveLink} size="sm"><Save className="h-4 w-4 mr-1" /> {saved ? "Saved!" : "Save Link"}</Button>
+  );
+}
+
+// ===== PARTNERS =====
+function PartnersPanel() {
+  const [partners, setPartners] = useState<any[]>([]);
+  const [name, setName] = useState("");
+  const [website, setWebsite] = useState("");
+  const [logoUrl, setLogoUrl] = useState("");
+  const { toast } = useToast();
+
+  useEffect(() => {
+    fetchPartners();
+  }, []);
+
+  const fetchPartners = async () => {
+    const { data } = await supabase.from("partners").select("*").order("name");
+    if (data) setPartners(data);
+  };
+
+  const addPartner = async () => {
+    if (!name || !website) return;
+    const { data } = await supabase.from("partners").insert({ name, website, logo_url: logoUrl || null }).select().single();
+    if (data) {
+      setPartners([...partners, data]);
+      setName("");
+      setWebsite("");
+      setLogoUrl("");
+      toast({ title: "Partner added" });
+    }
+  };
+
+  const deletePartner = async (id: string) => {
+    await supabase.from("partners").delete().eq("id", id);
+    setPartners(partners.filter(p => p.id !== id));
+    toast({ title: "Partner deleted" });
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="bg-card rounded-xl p-6 border border-border space-y-4">
+        <h3 className="font-semibold">Add Partner</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Input placeholder="Partner name" value={name} onChange={e => setName(e.target.value)} />
+          <Input placeholder="Website URL" value={website} onChange={e => setWebsite(e.target.value)} />
+          <Input placeholder="Logo URL (optional)" value={logoUrl} onChange={e => setLogoUrl(e.target.value)} />
+        </div>
+        <Button onClick={addPartner} size="sm"><Plus className="h-4 w-4 mr-1" /> Add Partner</Button>
+      </div>
+      <div className="space-y-4">
+        {partners.map(p => (
+          <div key={p.id} className="bg-card rounded-xl p-4 border border-border flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              {p.logo_url && <img src={p.logo_url} alt={p.name} className="h-10 w-10 object-contain" />}
+              <div>
+                <h4 className="font-semibold">{p.name}</h4>
+                <a href={p.website} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">{p.website}</a>
+              </div>
+            </div>
+            <Button size="sm" variant="ghost" onClick={() => deletePartner(p.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+          </div>
+        ))}
+        {partners.length === 0 && <p className="text-muted-foreground">No partners yet.</p>}
+      </div>
+    </div>
+  );
+}
+
+// ===== SPONSORS =====
+function SponsorsPanel() {
+  const [sponsors, setSponsors] = useState<any[]>([]);
+  const [name, setName] = useState("");
+  const [website, setWebsite] = useState("");
+  const [logoUrl, setLogoUrl] = useState("");
+  const { toast } = useToast();
+
+  useEffect(() => {
+    fetchSponsors();
+  }, []);
+
+  const fetchSponsors = async () => {
+    const { data } = await supabase.from("sponsors").select("*").order("name");
+    if (data) setSponsors(data);
+  };
+
+  const addSponsor = async () => {
+    if (!name || !website) return;
+    const { data } = await supabase.from("sponsors").insert({ name, website, logo_url: logoUrl || null }).select().single();
+    if (data) {
+      setSponsors([...sponsors, data]);
+      setName("");
+      setWebsite("");
+      setLogoUrl("");
+      toast({ title: "Sponsor added" });
+    }
+  };
+
+  const deleteSponsor = async (id: string) => {
+    await supabase.from("sponsors").delete().eq("id", id);
+    setSponsors(sponsors.filter(s => s.id !== id));
+    toast({ title: "Sponsor deleted" });
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="bg-card rounded-xl p-6 border border-border space-y-4">
+        <h3 className="font-semibold">Add Sponsor</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Input placeholder="Sponsor name" value={name} onChange={e => setName(e.target.value)} />
+          <Input placeholder="Website URL" value={website} onChange={e => setWebsite(e.target.value)} />
+          <Input placeholder="Logo URL (optional)" value={logoUrl} onChange={e => setLogoUrl(e.target.value)} />
+        </div>
+        <Button onClick={addSponsor} size="sm"><Plus className="h-4 w-4 mr-1" /> Add Sponsor</Button>
+      </div>
+      <div className="space-y-4">
+        {sponsors.map(s => (
+          <div key={s.id} className="bg-card rounded-xl p-4 border border-border flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              {s.logo_url && <img src={s.logo_url} alt={s.name} className="h-10 w-10 object-contain" />}
+              <div>
+                <h4 className="font-semibold">{s.name}</h4>
+                <a href={s.website} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">{s.website}</a>
+              </div>
+            </div>
+            <Button size="sm" variant="ghost" onClick={() => deleteSponsor(s.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+          </div>
+        ))}
+        {sponsors.length === 0 && <p className="text-muted-foreground">No sponsors yet.</p>}
       </div>
     </div>
   );

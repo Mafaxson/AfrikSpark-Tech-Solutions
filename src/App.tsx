@@ -5,6 +5,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import ProtectedAdminRoute from "@/components/ProtectedAdminRoute";
+import { lazy, Suspense } from "react";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Services from "./pages/Services";
@@ -16,11 +18,13 @@ import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import Contact from "./pages/Contact";
 import Login from "./pages/Login";
-import AdminDashboard from "./pages/AdminDashboard";
 import Community from "./pages/Community";
 import Testimonials from "./pages/Testimonials";
 import SubmitTestimonial from "./pages/SubmitTestimonial";
 import NotFound from "./pages/NotFound";
+
+// Lazy load heavy components
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 
 const queryClient = new QueryClient();
 
@@ -47,7 +51,7 @@ const App = () => (
               <Route path="/testimonials" element={<Testimonials />} />
               <Route path="/submit-testimonial" element={<SubmitTestimonial />} />
               <Route path="/login" element={<Login />} />
-              <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/admin" element={<ProtectedAdminRoute><Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div></div>}><AdminDashboard /></Suspense></ProtectedAdminRoute>} />
               <Route path="/community" element={<Community />} />
               <Route path="*" element={<NotFound />} />
             </Routes>

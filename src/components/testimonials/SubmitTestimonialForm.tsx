@@ -115,6 +115,18 @@ export const SubmitTestimonialForm = () => {
       reset();
       setImageFile(null);
       setImagePreview(null);
+
+      // Notify admin (don't wait for this)
+      supabase.functions.invoke("notify-admin", {
+        body: {
+          type: "testimony_submitted",
+          data: { name: data.name, testimony: data.testimony }
+        }
+      }).catch((emailError) => {
+        console.error("Failed to send admin notification:", emailError);
+        // Don't show error to user since testimonial was saved
+      });
+
     } catch (error: any) {
       console.error("Error submitting testimonial:", error);
       toast.error("Failed to submit testimonial. Please try again.");

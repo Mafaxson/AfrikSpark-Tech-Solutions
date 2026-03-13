@@ -15,25 +15,41 @@ export default function Contact() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    const form = e.target as HTMLFormElement;
-    const formData = new FormData(form);
 
-    const name = formData.get("name") as string;
-    const email = formData.get("email") as string;
-    const subject = formData.get("subject") as string;
-    const message = formData.get("message") as string;
+    try {
+      const form = e.target as HTMLFormElement;
+      const formData = new FormData(form);
 
-    const { error } = await supabase.from("contact_messages").insert({ name, email, subject, message });
+      const name = formData.get("name") as string;
+      const email = formData.get("email") as string;
+      const subject = formData.get("subject") as string;
+      const message = formData.get("message") as string;
 
-    if (error) {
-      toast({ title: "Error", description: "Something went wrong.", variant: "destructive" });
-    } else {
-      toast({ title: "Message Sent!", description: "We'll get back to you soon." });
+      const { error } = await supabase.from("contact_messages").insert({ name, email, subject, message });
+
+      if (error) {
+        console.error("Contact form error:", error);
+        toast({ title: "Error", description: "Something went wrong. Please try again.", variant: "destructive" });
+        return;
+      }
+
+      toast({ title: "Message Sent!", description: "Your message has been sent successfully." });
       form.reset();
-      // Notify admin
-      supabase.functions.invoke("notify-admin", { body: { type: "contact_form", data: { name, email, subject, message } } });
+
+      // Notify admin (don't wait for this)
+      supabase.functions.invoke("notify-admin", {
+        body: { type: "contact_form", data: { name, email, subject, message } }
+      }).catch((emailError) => {
+        console.error("Failed to send admin notification:", emailError);
+        // Don't show error to user since message was saved
+      });
+
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      toast({ title: "Error", description: "Something went wrong. Please try again.", variant: "destructive" });
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (

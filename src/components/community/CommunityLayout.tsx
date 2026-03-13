@@ -48,12 +48,16 @@ export default function CommunityLayout() {
         const announcement = data.find(c => c.type === "announcement");
         if (announcement) setView({ type: "channel", channelId: announcement.id });
       }
+    }).catch((error) => {
+      console.error("Error fetching channels:", error);
     });
 
     // Fetch unread notifications count
     supabase.from("notifications").select("id", { count: "exact", head: true })
       .eq("user_id", user.id).eq("read", false)
-      .then(({ count }) => setUnreadNotifs(count ?? 0));
+      .then(({ count }) => setUnreadNotifs(count ?? 0)).catch((error) => {
+        console.error("Error fetching notifications:", error);
+      });
 
     // Realtime notifications
     const notifChannel = supabase.channel("my-notifs")

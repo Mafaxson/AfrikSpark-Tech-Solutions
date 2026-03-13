@@ -23,32 +23,47 @@ export default function VentureStudio() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    const form = e.target as HTMLFormElement;
-    const formData = new FormData(form);
-    const startupData = {
-      founder_name: formData.get("founder") as string,
-      startup_name: formData.get("startup") as string,
-      problem: formData.get("problem") as string,
-      solution: formData.get("solution") as string,
-      stage: formData.get("stage") as string,
-      website: formData.get("website") as string || null,
-    };
 
-    const { error } = await supabase.from("startups").insert(startupData);
-    if (error) {
-      toast({ title: "Error", description: "Something went wrong.", variant: "destructive" });
-    } else {
-      toast({ title: "Application Submitted!", description: "We'll review and reach out." });
+    try {
+      const form = e.target as HTMLFormElement;
+      const formData = new FormData(form);
+      const startupData = {
+        founder_name: formData.get("founder") as string,
+        startup_name: formData.get("startup") as string,
+        problem: formData.get("problem") as string,
+        solution: formData.get("solution") as string,
+        stage: formData.get("stage") as string,
+        website: formData.get("website") as string || null,
+      };
+
+      const { error } = await supabase.from("startups").insert(startupData);
+
+      if (error) {
+        console.error("Venture form error:", error);
+        toast({ title: "Error", description: "Something went wrong. Please try again.", variant: "destructive" });
+        return;
+      }
+
+      toast({ title: "Application Submitted!", description: "Your application has been submitted successfully." });
       form.reset();
-      // Notify admin
-      supabase.functions.invoke("notify-admin", { 
-        body: { 
-          type: "startup_submission", 
-          data: startupData 
-        } 
+
+      // Notify admin (don't wait for this)
+      supabase.functions.invoke("notify-admin", {
+        body: {
+          type: "startup_submission",
+          data: startupData
+        }
+      }).catch((emailError) => {
+        console.error("Failed to send admin notification:", emailError);
+        // Don't show error to user since application was saved
       });
+
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      toast({ title: "Error", description: "Something went wrong. Please try again.", variant: "destructive" });
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
