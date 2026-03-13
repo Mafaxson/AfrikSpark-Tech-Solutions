@@ -614,6 +614,30 @@ function CommunityPanel() {
   );
 }
 
+// ===== SETTINGS =====
+function SettingsPanel() {
+  const [applicationLink, setApplicationLink] = useState("");
+  const [saved, setSaved] = useState(false);
+  const { toast } = useToast();
+  useEffect(() => { supabase.from("site_settings").select("*").eq("key", "dss_application_link").single().then(({ data }) => { if (data) setApplicationLink(data.value || ""); }); }, []);
+  const saveLink = async () => {
+    const { data: existing } = await supabase.from("site_settings").select("id").eq("key", "dss_application_link").single();
+    if (existing) await supabase.from("site_settings").update({ value: applicationLink }).eq("key", "dss_application_link");
+    else await supabase.from("site_settings").insert({ key: "dss_application_link", value: applicationLink });
+    toast({ title: "Application link saved" }); setSaved(true); setTimeout(() => setSaved(false), 2000);
+  };
+  return (
+    <div className="space-y-6">
+      <div className="bg-card rounded-xl p-6 border border-border space-y-4">
+        <h3 className="font-semibold">DSS Application Form Link</h3>
+        <p className="text-sm text-muted-foreground">Set the external application form URL. This is where applicants will be redirected to apply and pay the LE 250 fee.</p>
+        <Input placeholder="https://forms.google.com/... or any external form link" value={applicationLink} onChange={e => setApplicationLink(e.target.value)} />
+        <Button onClick={saveLink} size="sm"><Save className="h-4 w-4 mr-1" /> {saved ? "Saved!" : "Save Link"}</Button>
+      </div>
+    </div>
+  );
+}
+
 // ===== CHANNELS =====
 function ChannelsPanel() {
   return <div className="text-center py-8 text-muted-foreground">Channels management coming soon.</div>;
