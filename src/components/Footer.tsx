@@ -7,7 +7,7 @@ const footerLinks = {
     { label: "About", path: "/about" },
     { label: "Services", path: "/services" },
     { label: "Projects", path: "/projects" },
-    { label: "Impact", path: "/impact" },
+    { label: "Testimonies", path: "/testimonials" },
     { label: "Partners", path: "/partners" },
   ],
   Programs: [
@@ -30,8 +30,9 @@ export function Footer() {
           {/* Brand */}
           <div>
             <img src={logo} alt="AfrikSpark Tech Solutions" className="h-10 w-auto mb-4 rounded" />
+            <p className="text-background/80 font-medium text-sm mb-1">Tech · Branding · Consultancy</p>
             <p className="text-background/60 text-sm leading-relaxed mb-6">
-              Empowering Africa through digital skills and technology innovation.
+              We teach digital skills, help people earn, and provide tech solutions to grow businesses and solve real-world challenges.
             </p>
             <div className="flex flex-col gap-2 text-sm text-background/60">
               <div className="flex items-center gap-2">
@@ -41,6 +42,10 @@ export function Footer() {
               <div className="flex items-center gap-2">
                 <Mail className="h-4 w-4 text-primary" />
                 info@afrikspark.tech
+              </div>
+              <div className="flex items-center gap-2">
+                <Phone className="h-4 w-4 text-primary" />
+                +232 77 299 080
               </div>
             </div>
           </div>

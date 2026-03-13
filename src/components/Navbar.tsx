@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
 import logo from "@/assets/afrikspark-logo.jpeg";
 
 const navItems = [
@@ -11,7 +12,7 @@ const navItems = [
   { label: "Services", path: "/services" },
   { label: "DSS", path: "/dss" },
   { label: "Projects", path: "/projects" },
-  { label: "Testimonies", path: "/impact" },
+  { label: "Testimonies", path: "/testimonials" },
   { label: "Partners", path: "/partners" },
   { label: "Venture Studio", path: "/venture-studio" },
   { label: "Blog", path: "/blog" },
@@ -22,6 +23,7 @@ export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
+  const { user, isAdmin, signOut } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -62,12 +64,30 @@ export function Navbar() {
         </div>
 
         <div className="hidden lg:flex items-center gap-2">
-          <Button variant="ghost" size="sm" asChild>
-            <Link to="/login">Login</Link>
-          </Button>
-          <Button size="sm" asChild>
-            <Link to="/dss">Apply for DSS</Link>
-          </Button>
+          {user ? (
+            <>
+              {isAdmin && (
+                <Button variant="ghost" size="sm" asChild>
+                  <Link to="/admin">Dashboard</Link>
+                </Button>
+              )}
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/community">Community</Link>
+              </Button>
+              <Button variant="ghost" size="sm" onClick={signOut}>
+                <LogOut className="h-4 w-4 mr-1" /> Sign Out
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/login">Login</Link>
+              </Button>
+              <Button size="sm" asChild>
+                <Link to="/dss">Apply for DSS</Link>
+              </Button>
+            </>
+          )}
         </div>
 
         {/* Mobile toggle */}
@@ -99,12 +119,30 @@ export function Navbar() {
               </Link>
             ))}
             <div className="flex gap-2 mt-3 pt-3 border-t border-border">
-              <Button variant="ghost" size="sm" className="flex-1" asChild>
-                <Link to="/login">Login</Link>
-              </Button>
-              <Button size="sm" className="flex-1" asChild>
-                <Link to="/dss">Apply for DSS</Link>
-              </Button>
+              {user ? (
+                <>
+                  <Button variant="ghost" size="sm" className="flex-1" asChild>
+                    <Link to="/community">Community</Link>
+                  </Button>
+                  {isAdmin && (
+                    <Button variant="ghost" size="sm" className="flex-1" asChild>
+                      <Link to="/admin">Dashboard</Link>
+                    </Button>
+                  )}
+                  <Button variant="ghost" size="sm" className="flex-1" onClick={signOut}>
+                    Sign Out
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button variant="ghost" size="sm" className="flex-1" asChild>
+                    <Link to="/login">Login</Link>
+                  </Button>
+                  <Button size="sm" className="flex-1" asChild>
+                    <Link to="/dss">Apply for DSS</Link>
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </div>

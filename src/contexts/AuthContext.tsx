@@ -31,9 +31,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const loadUserState = async (currentUser: User | null) => {
       if (!currentUser) {
-        setIsAdmin(false);
-        setIsApproved(false);
-        setLoading(false);
+        if (isMounted) {
+          setIsAdmin(false);
+          setIsApproved(false);
+          setLoading(false);
+        }
         return;
       }
 
@@ -45,33 +47,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       const isAdminUser = roles?.some((r: any) => r.role === "admin") ?? false;
       const approved = profile?.approved ?? false;
-      const isApprovedUser = isAdminUser || approved;
-
-      // Auto-approve the user so they can access the community immediately.
-      // This lets the site work without waiting for manual approval.
-      if (!isApprovedUser) {
-        await supabase.from("profiles").update({ approved: true }).eq("user_id", currentUser.id);
-      }
 
       if (!isMounted) return;
       setIsAdmin(isAdminUser);
-      setIsApproved(true);
+      setIsApproved(isAdminUser || approved);
       setLoading(false);
     };
 
-    const init = async () => {
-      const { data } = await supabase.auth.getSession();
-      const currentUser = data?.session?.user ?? null;
-      setUser(currentUser);
-      await loadUserState(currentUser);
-    };
-
-    init();
-
+    // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       const currentUser = session?.user ?? null;
-      setUser(currentUser);
+      if (isMounted) setUser(currentUser);
       await loadUserState(currentUser);
+    });
+
+    // Then get initial session
+    supabase.auth.getSession().then(({ data }) => {
+      const currentUser = data?.session?.user ?? null;
+      if (isMounted) setUser(currentUser);
+      loadUserState(currentUser);
     });
 
     return () => {
