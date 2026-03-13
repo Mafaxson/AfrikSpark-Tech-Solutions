@@ -568,6 +568,9 @@ function SettingsPanel() {
         <h3 className="font-semibold">DSS Application Form Link</h3>
         <p className="text-sm text-muted-foreground">Set the external application form URL. This is where applicants will be redirected to apply and pay the LE 250 fee.</p>
         <Input placeholder="https://forms.google.com/... or any external form link" value={applicationLink} onChange={e => setApplicationLink(e.target.value)} />
+        <Button onClick={saveLink} size="sm"><Save className="h-4 w-4 mr-1" /> {saved ? "Saved!" : "Save Link"}</Button>
+      </div>
+    </div>
   );
 }
 
