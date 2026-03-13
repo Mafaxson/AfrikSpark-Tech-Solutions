@@ -158,36 +158,6 @@ function OverviewPanel() {
   );
 }
 
-  const cards = [
-    { label: "DSS Applications", value: stats.applications ?? 0, icon: GraduationCap },
-    { label: "Students", value: stats.students ?? 0, icon: Users },
-    { label: "Cohorts", value: stats.cohorts ?? 0, icon: BookOpen },
-    { label: "Channels", value: stats.channels ?? 0, icon: Hash },
-    { label: "Events", value: stats.events ?? 0, icon: Calendar },
-    { label: "Resources", value: stats.resources ?? 0, icon: FolderOpen },
-    { label: "Blog Posts", value: stats.blogs ?? 0, icon: FileText },
-    { label: "Contact Messages", value: stats.messages ?? 0, icon: Mail },
-    { label: "Testimonies", value: stats.testimonies ?? 0, icon: Star },
-    { label: "Pending Approvals", value: stats.pendingApprovals ?? 0, icon: UserCheck },
-  ];
-
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-      {cards.map((card) => (
-        <div key={card.label} className="bg-card rounded-xl p-6 border border-border">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-              <card.icon className="h-5 w-5 text-primary" />
-            </div>
-            <span className="text-sm text-muted-foreground">{card.label}</span>
-          </div>
-          <div className="font-display text-3xl font-bold">{card.value}</div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 // ===== APPLICATIONS =====
 function ApplicationsPanel() {
   const [apps, setApps] = useState<any[]>([]);
