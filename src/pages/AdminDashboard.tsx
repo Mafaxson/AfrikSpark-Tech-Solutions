@@ -18,7 +18,7 @@ import {
 type Tab = "overview" | "applications" | "cohorts" | "students" | "blog" | "messages" | "testimonies" | "community" | "channels" | "events" | "resources" | "settings" | "partners" | "sponsors";
 
 export default function AdminDashboard() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const [activeTab, setActiveTab] = useState<Tab>("overview");
 
   if (loading) return <Layout><Section><p>Loading...</p></Section></Layout>;
@@ -551,27 +551,72 @@ function ResourcesPanel() {
   );
 }
 
-// ===== SETTINGS =====
-function SettingsPanel() {
-  const [applicationLink, setApplicationLink] = useState(""); const [saved, setSaved] = useState(false);
+// ===== BLOG =====
+function BlogPanel() {
+  return <BlogManagement />;
+}
+
+// ===== MESSAGES =====
+function MessagesPanel() {
+  const [messages, setMessages] = useState<any[]>([]);
   const { toast } = useToast();
-  useEffect(() => { supabase.from("site_settings").select("*").eq("key", "dss_application_link").single().then(({ data }) => { if (data) setApplicationLink(data.value || ""); }); }, []);
-  const saveLink = async () => {
-    const { data: existing } = await supabase.from("site_settings").select("id").eq("key", "dss_application_link").single();
-    if (existing) await supabase.from("site_settings").update({ value: applicationLink }).eq("key", "dss_application_link");
-    else await supabase.from("site_settings").insert({ key: "dss_application_link", value: applicationLink });
-    toast({ title: "Application link saved" }); setSaved(true); setTimeout(() => setSaved(false), 2000);
-  };
+  useEffect(() => { supabase.from("contact_messages").select("*").order("created_at", { ascending: false }).then(({ data }) => { if (data) setMessages(data); }); }, []);
   return (
-    <div className="space-y-6">
-      <div className="bg-card rounded-xl p-6 border border-border space-y-4">
-        <h3 className="font-semibold">DSS Application Form Link</h3>
-        <p className="text-sm text-muted-foreground">Set the external application form URL. This is where applicants will be redirected to apply and pay the LE 250 fee.</p>
-        <Input placeholder="https://forms.google.com/... or any external form link" value={applicationLink} onChange={e => setApplicationLink(e.target.value)} />
-        <Button onClick={saveLink} size="sm"><Save className="h-4 w-4 mr-1" /> {saved ? "Saved!" : "Save Link"}</Button>
-      </div>
+    <div className="space-y-4">
+      <p className="text-sm text-muted-foreground">Manage contact form messages.</p>
+      {messages.map(m => (
+        <div key={m.id} className="bg-card rounded-xl p-4 border border-border">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <h4 className="font-semibold">{m.subject}</h4>
+              <p className="text-sm text-muted-foreground">From {m.name} ({m.email})</p>
+              <p className="text-sm mt-2">{m.message}</p>
+            </div>
+          </div>
+        </div>
+      ))}
+      {messages.length === 0 && <p className="text-muted-foreground">No messages yet.</p>}
     </div>
   );
+}
+
+// ===== TESTIMONIES =====
+function TestimoniesPanel() {
+  return <TestimonialManagement />;
+}
+
+// ===== COMMUNITY =====
+function CommunityPanel() {
+  const [profiles, setProfiles] = useState<any[]>([]);
+  const { toast } = useToast();
+  useEffect(() => { supabase.from("profiles").select("*").order("display_name").then(({ data }) => { if (data) setProfiles(data); }); }, []);
+  const toggleApproval = async (id: string, approved: boolean) => {
+    await supabase.from("profiles").update({ approved }).eq("id", id);
+    setProfiles(profiles.map(p => p.id === id ? { ...p, approved } : p));
+    toast({ title: `Profile ${approved ? "approved" : "unapproved"}` });
+  };
+  return (
+    <div className="space-y-4">
+      <p className="text-sm text-muted-foreground">Manage community member profiles.</p>
+      {profiles.map(p => (
+        <div key={p.id} className="bg-card rounded-xl p-4 border border-border flex items-center justify-between">
+          <div>
+            <h4 className="font-semibold">{p.display_name}</h4>
+            <p className="text-sm text-muted-foreground">{p.email}</p>
+          </div>
+          <Button size="sm" variant={p.approved ? "destructive" : "default"} onClick={() => toggleApproval(p.id, !p.approved)}>
+            {p.approved ? "Unapprove" : "Approve"}
+          </Button>
+        </div>
+      ))}
+      {profiles.length === 0 && <p className="text-muted-foreground">No profiles yet.</p>}
+    </div>
+  );
+}
+
+// ===== CHANNELS =====
+function ChannelsPanel() {
+  return <div className="text-center py-8 text-muted-foreground">Channels management coming soon.</div>;
 }
 
 // ===== PARTNERS =====
@@ -702,4 +747,72 @@ function SponsorsPanel() {
       </div>
     </div>
   );
+}
+
+// ===== BLOG =====
+function BlogPanel() {
+  return <BlogManagement />;
+}
+
+// ===== MESSAGES =====
+function MessagesPanel() {
+  const [messages, setMessages] = useState<any[]>([]);
+  const { toast } = useToast();
+  useEffect(() => { supabase.from("contact_messages").select("*").order("created_at", { ascending: false }).then(({ data }) => { if (data) setMessages(data); }); }, []);
+  return (
+    <div className="space-y-4">
+      <p className="text-sm text-muted-foreground">Manage contact form messages.</p>
+      {messages.map(m => (
+        <div key={m.id} className="bg-card rounded-xl p-4 border border-border">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <h4 className="font-semibold">{m.subject}</h4>
+              <p className="text-sm text-muted-foreground">From {m.name} ({m.email})</p>
+              <p className="text-sm mt-2">{m.message}</p>
+            </div>
+          </div>
+        </div>
+      ))}
+      {messages.length === 0 && <p className="text-muted-foreground">No messages yet.</p>}
+    </div>
+  );
+}
+
+// ===== TESTIMONIES =====
+function TestimoniesPanel() {
+  return <TestimonialManagement />;
+}
+
+// ===== COMMUNITY =====
+function CommunityPanel() {
+  const [profiles, setProfiles] = useState<any[]>([]);
+  const { toast } = useToast();
+  useEffect(() => { supabase.from("profiles").select("*").order("display_name").then(({ data }) => { if (data) setProfiles(data); }); }, []);
+  const toggleApproval = async (id: string, approved: boolean) => {
+    await supabase.from("profiles").update({ approved }).eq("id", id);
+    setProfiles(profiles.map(p => p.id === id ? { ...p, approved } : p));
+    toast({ title: `Profile ${approved ? "approved" : "unapproved"}` });
+  };
+  return (
+    <div className="space-y-4">
+      <p className="text-sm text-muted-foreground">Manage community member profiles.</p>
+      {profiles.map(p => (
+        <div key={p.id} className="bg-card rounded-xl p-4 border border-border flex items-center justify-between">
+          <div>
+            <h4 className="font-semibold">{p.display_name}</h4>
+            <p className="text-sm text-muted-foreground">{p.email}</p>
+          </div>
+          <Button size="sm" variant={p.approved ? "destructive" : "default"} onClick={() => toggleApproval(p.id, !p.approved)}>
+            {p.approved ? "Unapprove" : "Approve"}
+          </Button>
+        </div>
+      ))}
+      {profiles.length === 0 && <p className="text-muted-foreground">No profiles yet.</p>}
+    </div>
+  );
+}
+
+// ===== CHANNELS =====
+function ChannelsPanel() {
+  return <div className="text-center py-8 text-muted-foreground">Channels management coming soon.</div>;
 }
